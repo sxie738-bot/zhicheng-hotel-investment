@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>致城酒店投资测算系统</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap');
+  :root {
+    --ink: #1a1a1c; --ink-soft: #2d2d31; --paper: #faf9f6;
+    --warm-50: #f5f3f0; --warm-100: #ebe7e2; --warm-200: #d6d1ca; --warm-300: #b8b2a9;
+    --warm-400: #9a9389; --warm-500: #7d756a; --warm-600: #60594f;
+    --gold: #b8963e; --gold-light: #d4b96a; --gold-dim: #8a6d2e;
+    --burgundy: #7a2e3f; --teal: #2d6a5e; --teal-light: #3d8a7b;
+    --navy: #1e3a5f; --navy-light: #2a5080;
+    --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,.06),0 3px 12px rgba(0,0,0,.04);
+    --font: 'Noto Sans SC', system-ui, sans-serif;
+    --font-display: 'DM Serif Display', 'Noto Sans SC', serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{font-size:15px;scroll-behavior:smooth}
+  body{font-family:var(--font);background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+  button{font-family:var(--font);cursor:pointer}
+  input,select,textarea{font-family:var(--font)}
+  a{color:var(--navy);text-decoration:none}
+
+  /* HEADER */
+  .header{background:linear-gradient(135deg,var(--ink) 0%,var(--ink-soft) 100%);padding:0.9rem 1.8rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;border-bottom:3px solid var(--gold);position:sticky;top:0;z-index:50}
+  .header-brand{display:flex;align-items:center;gap:0.75rem}
+  .header-logo{width:36px;height:36px;background:var(--gold);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1.2rem;color:var(--ink);font-weight:700}
+  .header h1{font-family:var(--font-display);font-size:1.2rem;font-weight:400;color:var(--paper);letter-spacing:.02em}
+  .header .sub{font-size:0.65rem;color:var(--warm-400)}
+  .header-right{display:flex;align-items:center;gap:0.75rem}
+  .header-right .user-tag{display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;color:var(--warm-300);background:rgba(255,255,255,.08);padding:0.35rem 0.7rem;border-radius:100px}
+  .header-right .user-tag .dot{width:6px;height:6px;border-radius:50%;background:var(--gold)}
+  .btn-sm{padding:0.35rem 0.75rem;font-size:0.7rem;border-radius:var(--radius-sm);border:none;font-weight:600;letter-spacing:.03em;transition:all .15s}
+  .btn-gold{background:var(--gold);color:var(--ink)}
+  .btn-gold:hover{background:var(--gold-light)}
+  .btn-outline{background:transparent;color:var(--warm-300);border:1px solid var(--warm-600)}
+  .btn-outline:hover{color:var(--paper);border-color:var(--warm-300)}
+  .btn-nav{background:transparent;color:var(--paper);border:none;font-size:0.75rem;padding:0.35rem 0.6rem;border-radius:var(--radius-sm);font-weight:500;letter-spacing:.02em;transition:all .15s}
+  .btn-nav:hover{background:rgba(255,255,255,.1)}
+  .btn-nav.active{background:var(--gold);color:var(--ink)}
+
+  /* LAYOUT */
+  .container{max-width:1440px;margin:0 auto;padding:1.25rem 1.5rem}
+  .tabs{display:flex;gap:0;margin-bottom:1.25rem;border-bottom:2px solid var(--warm-200)}
+  .tab-btn{padding:0.6rem 1.5rem;border:none;background:none;font-size:0.8rem;font-weight:600;color:var(--warm-400);letter-spacing:.03em;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+  .tab-btn:hover{color:var(--ink)}
+  .tab-btn.active{color:var(--ink);border-bottom-color:var(--gold)}
+
+  /* PAGE PANELS */
+  .page{display:none}
+  .page.active{display:block}
+
+  /* CARDS */
+  .card{background:white;border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;margin-bottom:1.25rem}
+  .card-header{padding:0.85rem 1.25rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--warm-100)}
+  .card-header h3{font-size:0.75rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink)}
+  .card-body{padding:1.25rem}
+
+  /* GRID */
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:1.25rem}
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem}
+  .grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.25rem}
+
+  /* FORM */
+  .form-group{margin-bottom:0.75rem}
+  .form-group label{display:block;font-size:0.68rem;font-weight:600;color:var(--warm-500);margin-bottom:0.25rem;letter-spacing:.03em;text-transform:uppercase}
+  .form-group input,.form-group select,.form-group textarea{width:100%;padding:0.5rem 0.65rem;border:1.5px solid var(--warm-200);border-radius:var(--radius-sm);font-size:0.82rem;color:var(--ink);background:var(--warm-50);transition:border-color .15s,box-shadow .15s}
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,150,62,.12);background:white}
+  .form-group textarea{min-height:70px;resize:vertical}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem}
+  .form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem}
+  .input-unit{font-size:0.65rem;color:var(--warm-400)}
+
+  /* BUTTONS */
+  .btn{padding:0.55rem 1.25rem;font-size:0.75rem;border-radius:var(--radius-sm);border:none;font-weight:600;letter-spacing:.03em;transition:all .15s}
+  .btn-primary{background:var(--navy);color:white}
+  .btn-primary:hover{background:var(--navy-light)}
+  .btn-warn{background:var(--burgundy);color:white}
+  .btn-warn:hover{background:#962a3f}
+  .btn-ghost{background:transparent;color:var(--warm-500);border:1px solid var(--warm-200)}
+  .btn-ghost:hover{border-color:var(--warm-400);color:var(--ink)}
+  .btn-block{display:block;width:100%}
+  .btn-lg{padding:0.7rem 2rem;font-size:0.85rem}
+
+  /* TABLE */
+  .table-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:0.78rem}
+  thead th{background:var(--warm-50);padding:.55rem .75rem;text-align:left;font-weight:600;font-size:.65rem;letter-spacing:.04em;text-transform:uppercase;color:var(--warm-500);border-bottom:2px solid var(--warm-200);white-space:nowrap}
+  tbody td{padding:.55rem .75rem;border-bottom:1px solid var(--warm-100)}
+  tbody tr:hover{background:var(--warm-50)}
+  td.num{font-family:var(--font-mono);text-align:right;font-size:.75rem}
+
+  /* BADGES */
+  .badge{display:inline-block;padding:0.15rem 0.5rem;border-radius:100px;font-size:0.62rem;font-weight:700;letter-spacing:.04em}
+  .badge-green{background:#e6f4ee;color:var(--teal)}
+  .badge-red{background:#fdecee;color:var(--burgundy)}
+  .badge-gold{background:#fdf5e6;color:var(--gold-dim)}
+  .badge-gray{background:var(--warm-100);color:var(--warm-500)}
+  .badge-blue{background:#e8eff7;color:var(--navy)}
+
+  /* KPI */
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--warm-100)}
+  .kpi-item{background:white;padding:1rem 1rem .85rem}
+  .kpi-label{font-size:.62rem;font-weight:600;color:var(--warm-500);letter-spacing:.05em;text-transform:uppercase}
+  .kpi-value{font-family:var(--font-mono);font-size:1.15rem;font-weight:600;color:var(--ink);margin-top:2px}
+  .kpi-sub{font-size:.62rem;color:var(--warm-400);margin-top:1px}
+
+  /* SEASON BOXES */
+  .season-box{padding:0.55rem 0.7rem;border-radius:var(--radius-sm);border-left:3px solid;margin-bottom:0.5rem}
+  .season-box.peak{background:#f0f8f5;border-color:var(--teal)}
+  .season-box.mid{background:#faf9f6;border-color:var(--gold)}
+  .season-box.low{background:#fdf5f4;border-color:var(--burgundy)}
+  .season-box .season-title{font-size:.62rem;font-weight:700;letter-spacing:.06em;margin-bottom:.3rem}
+  .season-box.peak .season-title{color:var(--teal)}
+  .season-box.mid .season-title{color:var(--gold-dim)}
+  .season-box.low .season-title{color:var(--burgundy)}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:100;animation:fadeIn .15s}
+  .modal{background:white;border-radius:var(--radius-lg);box-shadow:0 8px 40px rgba(0,0,0,.15);width:90%;max-width:500px;max-height:80vh;overflow-y:auto}
+  .modal-header{padding:1rem 1.25rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--warm-100)}
+  .modal-header h3{font-size:.85rem;font-weight:700}
+  .modal-close{background:none;border:none;font-size:1.2rem;color:var(--warm-400);cursor:pointer}
+  .modal-body{padding:1.25rem}
+  .modal-footer{padding:0.75rem 1.25rem;border-top:1px solid var(--warm-100);display:flex;justify-content:flex-end;gap:0.5rem}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:2rem;right:2rem;background:var(--ink-soft);color:var(--paper);padding:.65rem 1.25rem;border-radius:var(--radius-sm);font-size:.75rem;box-shadow:0 4px 20px rgba(0,0,0,.2);opacity:0;transform:translateY(10px);transition:all .25s;z-index:200;pointer-events:none}
+  .toast.show{opacity:1;transform:translateY(0)}
+  .toast.error{background:var(--burgundy)}
+
+  /* DUAL COMPARISON */
+  .dual{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+  .dual-col{border-radius:var(--radius-md);padding:1rem}
+  .dual-col.stable{background:#f4faf7;border:1px solid #d0e8de}
+  .dual-col.cons{background:#fdf8f7;border:1px solid #f0d8d4}
+  .dual-col h4{font-size:.75rem;font-weight:700;letter-spacing:.04em;margin-bottom:.75rem}
+  .dual-col.stable h4{color:var(--teal)}
+  .dual-col.cons h4{color:var(--burgundy)}
+  .dual-row{display:flex;justify-content:space-between;padding:.35rem 0;border-bottom:1px solid rgba(0,0,0,.04);font-size:.75rem}
+  .dual-row .lbl{color:var(--warm-500)}
+  .dual-row .val{font-family:var(--font-mono);font-weight:500}
+
+  /* EMPTY / LOADING */
+  .empty{text-align:center;padding:3rem 1.5rem;color:var(--warm-300)}
+  .empty .icon{font-size:2.5rem;margin-bottom:.5rem;opacity:.5}
+
+  /* VERDICT */
+  .verdict-banner{text-align:center;padding:1rem;border-radius:var(--radius-md);margin-bottom:1rem}
+  .verdict-banner .verdict-text{font-size:1.3rem;font-weight:700;display:inline-block;padding:.35rem 1.5rem;border-radius:var(--radius-sm);color:white}
+
+  /* RESPONSIVE */
+  @media(max-width:768px){.dual,.form-row,.form-row-3{grid-template-columns:1fr}.header{padding:.7rem 1rem}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-brand">
+    <div class="header-logo">致</div>
+    <div>
+      <h1>致城酒店投资测算</h1>
+      <div class="sub">商机管理 · 多人协同 · 智能决策</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="btn-nav active" data-page="clients">客资管理</button>
+    <button class="btn-nav" data-page="calc">投资测算</button>
+    <div class="user-tag" id="userTag">
+      <span class="dot"></span><span id="userNameDisplay">未登录</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ==================== 客资管理页 ==================== -->
+<div class="page active" id="page-clients">
+  <div class="card">
+    <div class="card-header">
+      <h3>客资列表</h3>
+      <div style="display:flex;gap:0.5rem;align-items:center">
+        <select id="filterStatus" style="padding:.35rem .5rem;font-size:.7rem;border:1px solid var(--warm-200);border-radius:var(--radius-sm)" onchange="loadClients()">
+          <option value="">全部状态</option>
+          <option value="待处理">待处理</option>
+          <option value="已认领">已认领</option>
+          <option value="已测算">已测算</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="openClientModal()">+ 录入客资</button>
+        <button class="btn btn-ghost btn-sm" onclick="loadClients()">刷新</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>酒店名称</th><th>面积m²</th><th>客房</th><th>联系人</th><th>来源</th><th>录入人</th><th>认领人</th><th>状态</th><th>时间</th><th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="clientTableBody">
+          <tr><td colspan="10" class="empty">加载中...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 测算页 ==================== -->
+<div class="page" id="page-calc">
+  <div class="grid2">
+    <!-- 左侧输入 -->
+    <div class="card">
+      <div class="card-header"><h3>参数录入</h3></div>
+      <div class="card-body" style="max-height:75vh;overflow-y:auto">
+        <!-- 选择一个客资 -->
+        <div class="form-group">
+          <label>关联客资 <span style="font-weight:400;text-transform:none;color:var(--warm-400)">(可选，选择后自动填充基础信息)</span></label>
+          <select id="linkClient" onchange="onLinkClient()">
+            <option value="">— 不关联 —</option>
+          </select>
+        </div>
+
+        <div style="background:var(--warm-50);padding:.75rem;border-radius:var(--radius-md);margin-bottom:.75rem">
+          <div style="font-size:.65rem;font-weight:700;letter-spacing:.06em;color:var(--gold-dim);margin-bottom:.5rem">基础信息</div>
+          <div class="form-row">
+            <div class="form-group"><label>酒店名称</label><input id="calcHotelName"></div>
+            <div class="form-group"><label>联系人</label><input id="calcContact"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>联系电话</label><input id="calcPhone"></div>
+            <div class="form-group"><label>客房数量 <span class="input-unit">间</span></label><input type="number" id="calcRooms" value="48"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>总面积 <span class="input-unit">m²</span></label><input type="number" id="calcArea" value="1800"></div>
+            <div class="form-group"><label>钻级</label><select id="calcLevel"><option>经济型</option><option>舒适型</option><option>中档型</option><option>高档型</option><option>豪华型</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>项目介入预算 <span class="input-unit">元</span></label><input type="number" id="calcInvest" value="730000"></div>
+            <div class="form-group"><label>转让预算 <span class="input-unit">元</span></label><input type="number" id="calcTransfer" value="500000"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>房押预算</label><input type="number" id="calcDeposit" value="180000"></div>
+            <div class="form-group"><label>筹开预算</label><input type="number" id="calcStartup" value="50000"></div>
+          </div>
+          <div class="form-group"><label>翻新预算</label><input type="number" id="calcReno" value="0"></div>
+        </div>
+
+        <div style="background:var(--warm-50);padding:.75rem;border-radius:var(--radius-md);margin-bottom:.75rem">
+          <div style="font-size:.65rem;font-weight:700;letter-spacing:.06em;color:var(--gold-dim);margin-bottom:.5rem">租金参数</div>
+          <div class="form-row">
+            <div class="form-group"><label>平方月租金 <span class="input-unit">元/m²</span></label><input type="number" id="calcSqmRent" value="25" step="0.5"></div>
+            <div class="form-group"><label>物业费 <span class="input-unit">元/m²/月</span></label><input type="number" id="calcPropFee" value="0" step="0.5"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>扣点率 <span class="input-unit">%</span></label><input type="number" id="calcRentRatio" value="0" step="0.1"></div>
+            <div class="form-group"><label>扣点基数 <span class="input-unit">元</span></label><input type="number" id="calcRentBase" value="0"></div>
+          </div>
+        </div>
+
+        <div style="background:var(--warm-50);padding:.75rem;border-radius:var(--radius-md);margin-bottom:.75rem">
+          <div style="font-size:.65rem;font-weight:700;letter-spacing:.06em;color:var(--gold-dim);margin-bottom:.5rem">三季收入模型</div>
+
+          <div class="season-box peak">
+            <div class="season-title">旺季</div>
+            <div class="form-row-3">
+              <div class="form-group"><label>月份数</label><input type="number" id="calcPeakM" value="3"></div>
+              <div class="form-group"><label>ADR <span class="input-unit">元</span></label><input type="number" id="calcPeakADR" value="180"></div>
+              <div class="form-group"><label>OCC <span class="input-unit">%</span></label><input type="number" id="calcPeakOCC" value="90"></div>
+            </div>
+          </div>
+          <div class="season-box mid">
+            <div class="season-title">平季</div>
+            <div class="form-row-3">
+              <div class="form-group"><label>月份数</label><input type="number" id="calcMidM" value="6"></div>
+              <div class="form-group"><label>ADR</label><input type="number" id="calcMidADR" value="160"></div>
+              <div class="form-group"><label>OCC</label><input type="number" id="calcMidOCC" value="90"></div>
+            </div>
+          </div>
+          <div class="season-box low">
+            <div class="season-title">淡季</div>
+            <div class="form-row-3">
+              <div class="form-group"><label>月份数</label><input type="number" id="calcLowM" value="3"></div>
+              <div class="form-group"><label>ADR</label><input type="number" id="calcLowADR" value="120"></div>
+              <div class="form-group"><label>OCC</label><input type="number" id="calcLowOCC" value="80"></div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top:0.5rem">
+            <label>保守预测折扣率 <span class="input-unit">%</span></label>
+            <input type="number" id="calcDiscount" value="85">
+          </div>
+        </div>
+
+        <div style="background:var(--warm-50);padding:.75rem;border-radius:var(--radius-md);margin-bottom:.75rem">
+          <div style="font-size:.65rem;font-weight:700;letter-spacing:.06em;color:var(--gold-dim);margin-bottom:.5rem">成本参数</div>
+          <div class="form-row">
+            <div class="form-group"><label>全年边际成本</label><input type="number" id="calcMarginal" value="240000"></div>
+            <div class="form-group"><label>员工数量</label><input type="number" id="calcStaff" value="8"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>年人均工资</label><input type="number" id="calcSalary" value="60000"></div>
+            <div class="form-group"><label>公积金留存率 <span class="input-unit">%</span></label><input type="number" id="calcFund" value="5"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>管理费率 <span class="input-unit">%</span></label><input type="number" id="calcMgmt" value="2" step="0.1"></div>
+            <div class="form-group"><label>分红比例 <span class="input-unit">%</span></label><input type="number" id="calcDiv" value="100"></div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block btn-lg" onclick="runCalculate()">开始测算</button>
+      </div>
+    </div>
+
+    <!-- 右侧结果 -->
+    <div id="calcResultPanel">
+      <div class="card">
+        <div class="empty">
+          <div class="icon">&#9744;</div>
+          <p style="font-weight:500;color:var(--warm-400)">填写左侧参数后点击「开始测算」</p>
+          <p style="font-size:.72rem;color:var(--warm-300)">系统将自动生成完整的投资测算报告</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ============== 录入客资弹窗 ============== -->
+<div class="modal-overlay" id="clientModal" style="display:none">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="clientModalTitle">录入客资</h3>
+      <button class="modal-close" onclick="closeClientModal()">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editClientId">
+      <div class="form-row">
+        <div class="form-group"><label>酒店名称 *</label><input id="clientHotelName" placeholder="如：FUNX 设计师酒店"></div>
+        <div class="form-group"><label>联系人</label><input id="clientContact"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>联系电话</label><input id="clientPhone"></div>
+        <div class="form-group"><label>线索来源</label><select id="clientSource"><option>专业中介</option><option>集团商机</option><option>自主开发</option><option>朋友介绍</option><option>网络渠道</option><option>其他</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>面积 m²</label><input type="number" id="clientArea" value="0"></div>
+        <div class="form-group"><label>客房数量</label><input type="number" id="clientRooms" value="0"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>钻级</label><select id="clientLevel"><option>经济型</option><option>舒适型</option><option>中档型</option><option>高档型</option><option>豪华型</option></select></div>
+        <div class="form-group"><label>酒店类型</label><select id="clientType"><option>连锁型</option><option>单体酒店</option></select></div>
+      </div>
+      <div class="form-group"><label>地址</label><input id="clientAddr" placeholder="详细地址"></div>
+      <div class="form-group"><label>备注</label><textarea id="clientNotes" placeholder="商机备忘..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeClientModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveClient()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============== 登录弹窗 ============== -->
+<div class="modal-overlay" id="loginModal" style="display:none">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>请输入您的名字</h3>
+      <button class="modal-close" onclick="closeLoginModal()">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.78rem;color:var(--warm-500);margin-bottom:.75rem">用于多人协同时识别录入人和认领人</p>
+      <div class="form-group"><label>您的名字</label><input id="loginName" placeholder="如：FUNX"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="doLogin()">确认</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════ STATE ═══════════════
+let currentUser = { id: '', name: '' };
+const API = '';
+
+// ═══════════════ INIT ═══════════════
+function init() {
+  // 检测是否通过 file:// 协议打开（而非服务器地址）
+  if (window.location.protocol === 'file:') {
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;text-align:center"><div><h2 style="color:#b8963e">请通过服务器地址访问</h2><p style="color:#666;margin:12px 0">不要直接双击 HTML 文件打开，请在浏览器中输入服务器地址。</p><p style="font-size:14px">请复制以下地址到浏览器：</p><p style="font-size:18px;font-weight:700;background:#f5f3f0;padding:8px 16px;border-radius:4px;display:inline-block;margin-top:8px">http://<span id="ipHint">192.168.0.102</span>:8088</p></div></div>';
+    return;
+  }
+
+  const saved = localStorage.getItem('zhicheng_user');
+  if (saved) {
+    currentUser = JSON.parse(saved);
+    document.getElementById('userNameDisplay').textContent = currentUser.name;
+  } else {
+    setTimeout(() => document.getElementById('loginModal').style.display = 'flex', 400);
+  }
+
+  // Tab switching
+  document.querySelectorAll('.btn-nav').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + btn.dataset.page).classList.add('active');
+    });
+  });
+
+  fetch(API + '/api/ping').catch(() => showToast('无法连接服务器，请确认已通过 http://192.168.0.102:8088 访问', true));
+  loadClients();
+  loadClientOptions();
+}
+
+// ═══════════════ USER ═══════════════
+function doLogin() {
+  const name = document.getElementById('loginName').value.trim();
+  if (!name) return showToast('请输入名字', true);
+  fetch(API + '/api/users', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name })
+  }).then(r => r.json()).then(data => {
+    currentUser = { id: data.id, name: data.name };
+    localStorage.setItem('zhicheng_user', JSON.stringify(currentUser));
+    document.getElementById('userNameDisplay').textContent = currentUser.name;
+    closeLoginModal();
+    showToast('欢迎，' + currentUser.name);
+  });
+}
+
+function closeLoginModal() {
+  document.getElementById('loginModal').style.display = 'none';
+}
+
+// ═══════════════ CLIENTS ═══════════════
+function loadClients() {
+  const status = document.getElementById('filterStatus').value;
+  const url = API + '/api/clients' + (status ? '?status=' + encodeURIComponent(status) : '');
+  fetch(url).then(r => { if (!r.ok) throw new Error('加载失败'); return r.json(); }).then(data => {
+    const tbody = document.getElementById('clientTableBody');
+    if (!data.length) {
+      tbody.innerHTML = '<tr><td colspan="10" class="empty">暂无客资，点击「+ 录入客资」开始</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.map(c => {
+      const statusBadge = c.status === '已测算' ? 'badge-green' : c.status === '已认领' ? 'badge-blue' : 'badge-gray';
+      return `<tr>
+        <td><strong>${esc(c.hotel_name)}</strong></td>
+        <td>${c.area}</td><td>${c.rooms}</td>
+        <td>${esc(c.contact_name)}</td><td>${esc(c.source)}</td>
+        <td>${esc(c.created_by_name)}</td>
+        <td>${esc(c.claimed_by_name) || '—'}</td>
+        <td><span class="badge ${statusBadge}">${c.status}</span></td>
+        <td style="font-size:.7rem;color:var(--warm-400)">${c.created_at}</td>
+        <td style="white-space:nowrap">
+          ${!c.claimed_by && c.created_by !== currentUser.id ? `<button class="btn btn-gold btn-sm" onclick="claimClient('${c.id}')">认领</button> ` : ''}
+          <button class="btn btn-ghost btn-sm" onclick="editClient('${c.id}')">编辑</button>
+          <button class="btn btn-ghost btn-sm" onclick="deleteClient('${c.id}')" style="color:var(--burgundy)">删</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }).catch(e => { document.getElementById('clientTableBody').innerHTML = '<tr><td colspan="10" class="empty" style="color:var(--burgundy)">加载失败，请刷新页面或检查服务器状态</td></tr>'; });
+}
+
+function openClientModal() {
+  document.getElementById('editClientId').value = '';
+  document.getElementById('clientModalTitle').textContent = '录入客资';
+  ['clientHotelName','clientContact','clientPhone','clientAddr','clientNotes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('clientArea').value = '0';
+  document.getElementById('clientRooms').value = '0';
+  document.getElementById('clientModal').style.display = 'flex';
+}
+
+function editClient(cid) {
+  fetch(API + '/api/clients').then(r => r.json()).then(data => {
+    const c = data.find(x => x.id === cid);
+    if (!c) return;
+    document.getElementById('editClientId').value = cid;
+    document.getElementById('clientModalTitle').textContent = '编辑客资';
+    document.getElementById('clientHotelName').value = c.hotel_name;
+    document.getElementById('clientContact').value = c.contact_name;
+    document.getElementById('clientPhone').value = c.contact_phone;
+    document.getElementById('clientSource').value = c.source;
+    document.getElementById('clientArea').value = c.area;
+    document.getElementById('clientRooms').value = c.rooms;
+    document.getElementById('clientLevel').value = c.hotel_level;
+    document.getElementById('clientType').value = c.hotel_type;
+    document.getElementById('clientAddr').value = c.address;
+    document.getElementById('clientNotes').value = c.notes;
+    document.getElementById('clientModal').style.display = 'flex';
+  });
+}
+
+function closeClientModal() {
+  document.getElementById('clientModal').style.display = 'none';
+}
+
+function saveClient() {
+  const hotelName = document.getElementById('clientHotelName').value.trim();
+  if (!hotelName) return showToast('酒店名称不能为空', true);
+  const cid = document.getElementById('editClientId').value;
+  const payload = {
+    hotelName, contactName: document.getElementById('clientContact').value.trim(),
+    contactPhone: document.getElementById('clientPhone').value.trim(),
+    source: document.getElementById('clientSource').value,
+    area: parseFloat(document.getElementById('clientArea').value) || 0,
+    rooms: parseInt(document.getElementById('clientRooms').value) || 0,
+    hotelLevel: document.getElementById('clientLevel').value,
+    hotelType: document.getElementById('clientType').value,
+    address: document.getElementById('clientAddr').value.trim(),
+    notes: document.getElementById('clientNotes').value.trim(),
+    userId: currentUser.id, userName: currentUser.name,
+  };
+
+  const method = cid ? 'PUT' : 'POST';
+  const url = cid ? API + '/api/clients/' + cid : API + '/api/clients';
+
+  fetch(url, {
+    method, headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(r => {
+    if (!r.ok) return r.json().then(e => { throw new Error(e.detail || '保存失败') });
+    return r.json();
+  }).then(() => {
+    closeClientModal();
+    loadClients();
+    loadClientOptions();
+    showToast(cid ? '客资已更新' : '客资已录入');
+  }).catch(e => {
+    if (e.message.includes('Failed to fetch')) {
+      showToast('无法连接服务器，请确认已通过 http://192.168.0.102:8088 访问', true);
+    } else {
+      showToast(e.message, true);
+    }
+  });
+}
+
+function deleteClient(cid) {
+  if (!confirm('确认删除该客资？')) return;
+  fetch(API + '/api/clients/' + cid, { method: 'DELETE' }).then(() => {
+    loadClients(); loadClientOptions(); showToast('客资已删除');
+  });
+}
+
+function claimClient(cid) {
+  if (!currentUser.id) return showToast('请先登录', true);
+  fetch(API + '/api/clients/' + cid + '/claim', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId: currentUser.id, userName: currentUser.name })
+  }).then(r => {
+    if (!r.ok) return r.json().then(e => { throw new Error(e.detail) });
+    return r.json();
+  }).then(() => {
+    loadClients(); showToast('认领成功');
+  }).catch(e => showToast(e.message, true));
+}
+
+function loadClientOptions() {
+  fetch(API + '/api/clients').then(r => r.json()).then(data => {
+    const sel = document.getElementById('linkClient');
+    sel.innerHTML = '<option value="">— 不关联 —</option>' +
+      data.map(c => `<option value="${c.id}">${esc(c.hotel_name)} (${c.rooms}间 · ${c.status})</option>`).join('');
+  });
+}
+
+function onLinkClient() {
+  const cid = document.getElementById('linkClient').value;
+  if (!cid) return;
+  fetch(API + '/api/clients').then(r => r.json()).then(data => {
+    const c = data.find(x => x.id === cid);
+    if (!c) return;
+    document.getElementById('calcHotelName').value = c.hotel_name;
+    document.getElementById('calcContact').value = c.contact_name;
+    document.getElementById('calcPhone').value = c.contact_phone;
+    document.getElementById('calcRooms').value = c.rooms;
+    document.getElementById('calcArea').value = c.area;
+    document.getElementById('calcLevel').value = c.hotel_level;
+  });
+}
+
+// ═══════════════ CALCULATION ═══════════════
+function runCalculate() {
+  const params = {
+    hotelName: document.getElementById('calcHotelName').value || '未命名项目',
+    contactName: document.getElementById('calcContact').value,
+    contactPhone: document.getElementById('calcPhone').value,
+    roomCount: parseFloat(document.getElementById('calcRooms').value) || 0,
+    totalArea: parseFloat(document.getElementById('calcArea').value) || 0,
+    investBudget: parseFloat(document.getElementById('calcInvest').value) || 0,
+    transferBudget: parseFloat(document.getElementById('calcTransfer').value) || 0,
+    depositBudget: parseFloat(document.getElementById('calcDeposit').value) || 0,
+    startupBudget: parseFloat(document.getElementById('calcStartup').value) || 0,
+    renoBudget: parseFloat(document.getElementById('calcReno').value) || 0,
+    sqmRent: parseFloat(document.getElementById('calcSqmRent').value) || 0,
+    propertyFee: parseFloat(document.getElementById('calcPropFee').value) || 0,
+    rentRatio: parseFloat(document.getElementById('calcRentRatio').value) || 0,
+    rentBase: parseFloat(document.getElementById('calcRentBase').value) || 0,
+    peakMonths: parseFloat(document.getElementById('calcPeakM').value) || 0,
+    peakADR: parseFloat(document.getElementById('calcPeakADR').value) || 0,
+    peakOCC: parseFloat(document.getElementById('calcPeakOCC').value) || 0,
+    midMonths: parseFloat(document.getElementById('calcMidM').value) || 0,
+    midADR: parseFloat(document.getElementById('calcMidADR').value) || 0,
+    midOCC: parseFloat(document.getElementById('calcMidOCC').value) || 0,
+    lowMonths: parseFloat(document.getElementById('calcLowM').value) || 0,
+    lowADR: parseFloat(document.getElementById('calcLowADR').value) || 0,
+    lowOCC: parseFloat(document.getElementById('calcLowOCC').value) || 0,
+    discountRate: parseFloat(document.getElementById('calcDiscount').value) || 85,
+    yearlyMarginalCost: parseFloat(document.getElementById('calcMarginal').value) || 0,
+    staffCount: parseFloat(document.getElementById('calcStaff').value) || 0,
+    salaryPerStaff: parseFloat(document.getElementById('calcSalary').value) || 0,
+    fundRetention: parseFloat(document.getElementById('calcFund').value) || 5,
+    mgmtFeeRate: parseFloat(document.getElementById('calcMgmt').value) || 2,
+    dividendRatio: parseFloat(document.getElementById('calcDiv').value) || 100,
+  };
+
+  const totalM = params.peakMonths + params.midMonths + params.lowMonths;
+  if (totalM !== 12) return showToast('旺季+平季+淡季月份数之和必须等于12', true);
+  if (params.roomCount <= 0) return showToast('客房数量必须大于0', true);
+
+  const clientId = document.getElementById('linkClient').value;
+
+  fetch(API + '/api/calculate', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      params, clientId,
+      userId: currentUser.id, userName: currentUser.name,
+    })
+  }).then(r => {
+    if (!r.ok) return r.json().then(e => { throw new Error(e.detail) });
+    return r.json();
+  }).then(r => {
+    renderResult(r);
+    loadClients();
+    loadClientOptions();
+    showToast('测算完成');
+  }).catch(e => {
+    if (e.message.includes('Failed to fetch')) {
+      showToast('无法连接服务器，请确认已通过 http://192.168.0.102:8088 访问', true);
+    } else {
+      showToast(e.message, true);
+    }
+  });
+}
+
+function renderResult(r) {
+  const fmt = (v, d = 2) => Number(v).toLocaleString('zh-CN', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const F = v => '¥' + fmt(v);
+  const P = v => Number(v).toFixed(1) + '%';
+
+  const html = `
+    <div class="card">
+      <div class="card-header">
+        <h3>${esc(r.hotelName)} — 测算结果</h3>
+        <button class="btn btn-gold btn-sm" onclick="exportPDF('${r.calcId}')">导出 PDF 报告</button>
+      </div>
+      <div class="card-body">
+        <div class="verdict-banner" style="background:${r.verdictColor}15">
+          <span class="verdict-text" style="background:${r.verdictColor}">${r.verdict}</span>
+          <div style="font-size:.7rem;color:var(--warm-500);margin-top:.4rem">测算时间：${r.calcTime}</div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-item"><div class="kpi-label">项目介入预算</div><div class="kpi-value">${F(r.investBudget)}</div></div>
+          <div class="kpi-item"><div class="kpi-label">年化回报(稳健)</div><div class="kpi-value">${r.roiYears.stable} 年</div></div>
+          <div class="kpi-item"><div class="kpi-label">年化回报(保守)</div><div class="kpi-value">${r.roiYears.conservative} 年</div></div>
+          <div class="kpi-item"><div class="kpi-label">月纯利(稳健)</div><div class="kpi-value">${F(r.monthNetProfit.stable)}</div></div>
+          <div class="kpi-item"><div class="kpi-label">月纯利(保守)</div><div class="kpi-value">${F(r.monthNetProfit.conservative)}</div></div>
+          <div class="kpi-item"><div class="kpi-label">单房日租金</div><div class="kpi-value">${F(r.roomDayRent)}</div></div>
+        </div>
+
+        <h4 style="font-size:.8rem;margin:1rem 0 .5rem;color:var(--navy)">三季收入模型</h4>
+        <table>
+          <tr><th></th><th>月份</th><th>ADR</th><th>OCC</th><th>RevPar</th><th>季度收入</th></tr>
+          <tr><td style="color:var(--teal);font-weight:600">旺季</td><td>${r.peakRevenue > 0 ? '3' : '—'}</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">${F(r.peakRevenue)}</td></tr>
+          <tr><td style="color:var(--gold-dim);font-weight:600">平季</td><td>6</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">${F(r.midRevenue)}</td></tr>
+          <tr><td style="color:var(--burgundy);font-weight:600">淡季</td><td>3</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">${F(r.lowRevenue)}</td></tr>
+          <tr style="font-weight:600;background:#fdf8ed"><td>全年</td><td>12</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">${F(r.yearRevenue.stable)}</td></tr>
+        </table>
+
+        <h4 style="font-size:.8rem;margin:1rem 0 .5rem;color:var(--navy)">稳健 vs 保守对比</h4>
+        <div class="dual">
+          <div class="dual-col stable">
+            <h4>稳健测算</h4>
+            <div class="dual-row"><span class="lbl">全年收入</span><span class="val">${F(r.yearRevenue.stable)}</span></div>
+            <div class="dual-row"><span class="lbl">RevPar</span><span class="val">${F(r.yearRevPar.stable)}</span></div>
+            <div class="dual-row"><span class="lbl">ADR</span><span class="val">${F(r.yearADR.stable)}</span></div>
+            <div class="dual-row"><span class="lbl">OCC</span><span class="val">${P(r.yearOCC)}</span></div>
+            <div class="dual-row"><span class="lbl">间夜数</span><span class="val">${fmt(r.yearRoomNights.stable,0)}</span></div>
+            <div class="dual-row"><span class="lbl">GOP 毛利</span><span class="val" style="color:${r.gopGross.stable >= 0 ? 'var(--teal)' : 'var(--burgundy)'}">${F(r.gopGross.stable)}</span></div>
+            <div class="dual-row"><span class="lbl">GOP 率</span><span class="val">${P(r.gopRate.stable)}</span></div>
+            <div class="dual-row"><span class="lbl">年化回报</span><span class="val" style="color:${r.roiYears.stable < 2.5 ? 'var(--teal)' : r.roiYears.stable < 5 ? 'var(--gold-dim)' : 'var(--burgundy)'}">${r.roiYears.stable} 年</span></div>
+            <div class="dual-row"><span class="lbl">经营方月纯利</span><span class="val">${F(r.monthNetProfit.stable)}</span></div>
+            <div class="dual-row"><span class="lbl">盈亏平衡 RevPar</span><span class="val">${F(r.beRevPar.stable)}</span></div>
+            <div class="dual-row"><span class="lbl">盈亏平衡出租率</span><span class="val">${P(r.beOCC.stable)}</span></div>
+          </div>
+          <div class="dual-col cons">
+            <h4>保守测算</h4>
+            <div class="dual-row"><span class="lbl">全年收入</span><span class="val">${F(r.yearRevenue.conservative)}</span></div>
+            <div class="dual-row"><span class="lbl">RevPar</span><span class="val">${F(r.yearRevPar.conservative)}</span></div>
+            <div class="dual-row"><span class="lbl">ADR</span><span class="val">${F(r.yearADR.conservative)}</span></div>
+            <div class="dual-row"><span class="lbl">间夜数</span><span class="val">${fmt(r.yearRoomNights.conservative,0)}</span></div>
+            <div class="dual-row"><span class="lbl">GOP 毛利</span><span class="val" style="color:${r.gopGross.conservative >= 0 ? 'var(--teal)' : 'var(--burgundy)'}">${F(r.gopGross.conservative)}</span></div>
+            <div class="dual-row"><span class="lbl">GOP 率</span><span class="val">${P(r.gopRate.conservative)}</span></div>
+            <div class="dual-row"><span class="lbl">年化回报</span><span class="val" style="color:${r.roiYears.conservative < 2.5 ? 'var(--teal)' : r.roiYears.conservative < 5 ? 'var(--gold-dim)' : 'var(--burgundy)'}">${r.roiYears.conservative} 年</span></div>
+            <div class="dual-row"><span class="lbl">经营方月纯利</span><span class="val">${F(r.monthNetProfit.conservative)}</span></div>
+            <div class="dual-row"><span class="lbl">盈亏平衡 RevPar</span><span class="val">${F(r.beRevPar.conservative)}</span></div>
+            <div class="dual-row"><span class="lbl">盈亏平衡出租率</span><span class="val">${P(r.beOCC.conservative)}</span></div>
+          </div>
+        </div>
+
+        <h4 style="font-size:.8rem;margin:1rem 0 .5rem;color:var(--navy)">间夜成本拆分</h4>
+        <table>
+          <tr><th>租金成本</th><th>边际成本</th><th>人工成本</th><th>间夜总成本</th></tr>
+          <tr><td class="num">${F(r.nightRentCost)}</td><td class="num">${F(r.nightMarginalCost)}</td><td class="num">${F(r.nightLaborCost)}</td><td class="num" style="font-weight:600">${F(r.nightTotalCost)}</td></tr>
+        </table>
+
+        <h4 style="font-size:.8rem;margin:1rem 0 .5rem;color:var(--navy)">租金测算</h4>
+        <table>
+          <tr><th>年固定租金</th><th>年浮动租金</th><th>年总租金</th><th>月租金</th><th>日租金</th></tr>
+          <tr><td class="num">${F(r.yearFixedRent)}</td><td class="num">${F(r.yearFloatRent)}</td><td class="num" style="font-weight:600">${F(r.yearTotalRent)}</td><td class="num">${F(r.monthRent)}</td><td class="num">${F(r.dayRent)}</td></tr>
+        </table>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('calcResultPanel').innerHTML = html;
+}
+
+function exportPDF(calcId) {
+  const url = API + '/api/export-report/' + calcId;
+  const w = window.open(url, '_blank');
+  if (w) {
+    w.onload = () => { setTimeout(() => w.print(), 500); };
+  } else {
+    window.open(url);
+  }
+}
+
+// ═══════════════ UTILS ═══════════════
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast' + (isError ? ' error' : '') + ' show';
+  clearTimeout(t._tid); t._tid = setTimeout(() => t.className = 'toast', 2000);
+}
+
+init();
+</script>
+</body>
+</html>
