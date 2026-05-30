@@ -890,10 +890,10 @@ function renderCalcResult(r, histId) {
           '<div class="kpi-cell"><div class="kpi-lbl">\u5355\u623f\u65e5\u79df\u91d1</div><div class="kpi-val">' + F2(r.roomDayRent) + '</div></div>' +
         '</div>' +
         '<div class="tab-bar" style="margin-bottom:1rem">' +
-          '<button class="tab-btn active" onclick="switchCalcTab(this,\\'overview\\')">\u6536\u652f\u6982\u89c8</button>' +
-          '<button class="tab-btn" onclick="switchCalcTab(this,\\'charts\\')">\u56fe\u8868\u5206\u6790</button>' +
-          '<button class="tab-btn" onclick="switchCalcTab(this,\\'rent\\')">\u79df\u91d1\u8be6\u60c5</button>' +
-          '<button class="tab-btn" onclick="switchCalcTab(this,\\'cost\\')">\u6210\u672c\u76c8\u4e8f</button>' +
+          '<button class="tab-btn active" onclick="switchCalcTab(this,\'overview\')">\u6536\u652f\u6982\u89c8</button>' +
+          '<button class="tab-btn" onclick="switchCalcTab(this,\'charts\')">\u56fe\u8868\u5206\u6790</button>' +
+          '<button class="tab-btn" onclick="switchCalcTab(this,\'rent\')">\u79df\u91d1\u8be6\u60c5</button>' +
+          '<button class="tab-btn" onclick="switchCalcTab(this,\'cost\')">\u6210\u672c\u76c8\u4e8f</button>' +
         '</div>' +
 
         '<div class="tab-panel active" id="calc-tab-overview">' +
@@ -1007,7 +1007,7 @@ function renderCharts(r) {
     chartInstances['compare'] = new Chart(ctx2, {
       type: 'bar',
       data: { labels: ['\u5168\u5e74\u6536\u5165', '\u5168\u5e74\u6210\u672c', 'GOP\u6bdb\u5229'], datasets: [{ label: '\u7a33\u5065', data: [r.yearRevS, r.costS, r.gopS], backgroundColor: '#2d6a5e', borderRadius: 4 }, { label: '\u4fdd\u5b88', data: [r.yearRevC, r.costC, r.gopC], backgroundColor: '#b8963e', borderRadius: 4 }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } }, tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': \u00a5' + Math.round(ctx.raw).toLocaleString() } }, scales: { y: { ticks: { callback: v => '\u00a5' + (v / 10000).toFixed(0) + 'w' } } } }
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } }, tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': \u00a5' + Math.round(ctx.raw).toLocaleString() } } }, scales: { y: { ticks: { callback: v => '\u00a5' + (v / 10000).toFixed(0) + 'w' } } } }
     });
   }
   destroyChart('cost');
@@ -1017,7 +1017,7 @@ function renderCharts(r) {
     chartInstances['cost'] = new Chart(ctx3, {
       type: 'bar',
       data: { labels: ['\u6210\u672c\u7ed3\u6784'], datasets: [{ label: '\u5e74\u79df\u91d1', data: [r.yearRent], backgroundColor: '#1e3a5f', borderRadius: 3 }, { label: '\u8fb9\u9645\u6210\u672c', data: [marg], backgroundColor: '#b8963e', borderRadius: 3 }, { label: '\u4eba\u5de5\u6210\u672c', data: [r.yearSalary], backgroundColor: '#7a2e3f', borderRadius: 3 }] },
-      options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } }, tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': \u00a5' + Math.round(ctx.raw).toLocaleString() } }, scales: { x: { stacked: true, ticks: { callback: v => '\u00a5' + (v / 10000).toFixed(0) + 'w' } }, y: { stacked: true } } }
+      options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } }, tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': \u00a5' + Math.round(ctx.raw).toLocaleString() } } }, scales: { x: { stacked: true, ticks: { callback: v => '\u00a5' + (v / 10000).toFixed(0) + 'w' } }, y: { stacked: true } } }
     });
   }
 }
