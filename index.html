@@ -631,7 +631,7 @@ function renderClients() {
 
 function openClientModal(resetId) {
   if (resetId !== false) document.getElementById('editClientId').value = '';
-  document.getElementById('clientModalTitle').textContent = '\u5f55\u5f55\u5ba2\u8d44';
+  document.getElementById('clientModalTitle').textContent = '录入客资';
   ['clientHotelName', 'clientContact', 'clientPhone', 'clientAddr', 'clientNotes'].forEach(id => { try { document.getElementById(id).value = ''; } catch(e) {} });
   try { document.getElementById('clientArea').value = '0'; document.getElementById('clientRooms').value = '0'; } catch(e) {}
   document.getElementById('clientModal').style.display = 'flex';
