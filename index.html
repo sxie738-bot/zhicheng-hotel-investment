@@ -532,6 +532,7 @@ function loadChartJS(cb) {
 }
 // Load chart when user clicks calc tab (lazy load)
 document.addEventListener('DOMContentLoaded', () => {
+  init();
   if (window.requestIdleCallback) requestIdleCallback(() => loadChartJS(), { timeout: 3000 });
   else setTimeout(() => loadChartJS(), 2000);
 });
@@ -581,6 +582,7 @@ function doLogin() {
   DB.set('user', currentUser);
   document.getElementById('userNameDisplay').textContent = name;
   closeLoginModal();
+  renderClients();
   toast('欢迎，' + name);
 }
 
