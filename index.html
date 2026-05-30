@@ -1198,22 +1198,24 @@ function downloadPDF(histId) {
         console.log('downloadPDF: 开始生成, ' + total + ' 页');
 
         pages.forEach(function(pp, i) {
-          html2canvas(pp, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function(canvas) {
+          html2canvas(pp, { scale: 2, backgroundColor: '#ffffff', logging: false }).then(function(canvas) {
             try {
               var imgW = pdfW;
               var imgH = (canvas.height * pdfW) / canvas.width;
               if (i > 0) pdf.addPage();
-              pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, imgH);
+              // jsPDF 2.x 原生支持传入 Canvas 对象，避免 toDataURL 的内存/编码崩溃
+              pdf.addImage(canvas, 'PNG', 0, 0, imgW, imgH);
               processed++;
+              console.log('downloadPDF: 第' + (i+1) + '页完成 (' + canvas.width + 'x' + canvas.height + ')');
               if (processed === total && !failed) {
                 toast('PDF已下载', false);
                 var fname = (h.result.hotelName || '酒店投资测算') + '_投资测算报告.pdf';
-                console.log('downloadPDF: 完成, 文件名=', fname);
+                console.log('downloadPDF: 完成, 文件名=' + fname);
                 pdf.save(fname);
               }
             } catch(e2) {
               failed = true;
-              console.error('downloadPDF: 添加图片失败', e2);
+              console.error('downloadPDF: addImage 失败', e2);
               toast('PDF生成失败，请尝试直接打印', true);
             }
           }).catch(function(e) {
