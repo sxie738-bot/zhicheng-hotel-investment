@@ -539,7 +539,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ===== STORAGE ENGINE =====
 const DB = {
   prefix: 'zhicheng_v3_',
-  get(k) { try { return JSON.parse(localStorage.getItem(this.prefix + k) || 'null'); } catch { return null; } },
+  get(k) { try { return JSON.parse(localStorage.getItem(this.prefix + k) || 'null'); } catch(e) { return null; } },
   set(k, v) { try { localStorage.setItem(this.prefix + k, JSON.stringify(v)); } catch(e) { console.warn('DB.set error:', e); } },
   del(k) { localStorage.removeItem(this.prefix + k); }
 };
@@ -1268,3 +1268,10 @@ function toast(msg, isErr) {
     });
     if (sd.sharedBy) {
       localStorage.setItem('zhicheng_v3_user', JSON.stringify({ id: 'shared', name: sd.sharedBy }));
+    }
+  }
+})();
+</script>
+<!-- ___SHARED_DATA_PLACEHOLDER___ -->
+</body>
+</html>
