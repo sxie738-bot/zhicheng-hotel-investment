@@ -250,7 +250,11 @@ td.ctr{text-align:center}
 @media print{
   @page{size:A4;margin:0}
   html,body{background:#fff!important;margin:0;padding:0}
-  .no-print{display:none!important}
+  .header,.install-banner,.toast,.modal-overlay,.no-print{display:none!important}
+  .page:not(#page-report),.tab-bar,.tab-panel,.card:not(.report-document-parent),.report-actions{display:none!important}
+  .container{padding:0!important;margin:0!important;max-width:none!important}
+  #page-report{display:block!important;padding:0!important;margin:0!important}
+  #reportContent{padding:0!important;margin:0!important}
   .report-document{display:block!important;max-width:none!important;box-shadow:none!important;border-radius:0!important;border:none!important;margin:0!important;padding:0!important}
   .report-page{display:block!important;padding:14mm 12mm!important;page-break-after:always;border:none!important}
   .report-page:last-child{page-break-after:auto}
@@ -747,7 +751,7 @@ function createShareBundle() {
   fetch(location.href).then(r => r.text()).then(html => {
     // Inject data as a JS variable in a separate script block
     const scriptTag = '\n<script>\n// SHARED DATA INJECTION\nwindow.__SHARED_DATA__ = ' + dataJSON + ';\n<\/script>\n';
-    const injected = html.replace('___SHARED_DATA_PLACEHOLDER___', scriptTag);
+    const injected = html.replace('<!-- ___SHARED_DATA_PLACEHOLDER___ -->', scriptTag);
     const blob = new Blob([injected], { type: 'text/html' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
     a.download = '\u81f4\u57ce\u9152\u5e97\u6295\u8d44\u6d4b\u7b97_' + (data.clients.length || 0) + '\u6761\u5ba2\u8d44.html'; a.click();
