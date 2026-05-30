@@ -433,8 +433,8 @@ td.ctr{text-align:center}
 <!-- PAGE: 历史 -->
 <div class="page" id="page-history">
   <div class="g2" style="align-items:start">
-    <div class="card"><div class="card-header"><h3>测算历史</h3><button class="btn btn-warn btn-sm" onclick="clearHistory()">清空</button></div><div class="card-body" id="historyList" style="padding:.4rem"><div class="empty"><div class="empty-icon">🕐</div><p>暂无测算历史</p></div></div>
-    <div id="histDetail"><div class="card"><div class="empty"><div class="empty-icon">👈</div><p style="color:var(--warm-400);font-size:.78rem">点击左侧记录查看详情</p></div></div>
+    <div class="card"><div class="card-header"><h3>已保存的报告</h3><button class="btn btn-warn btn-sm" onclick="clearHistory()">清空</button></div><div class="card-body" id="historyList" style="padding:.4rem"><div class="empty"><div class="empty-icon">📑</div><p>完成测算并保存后，报告将出现在这里</p></div></div></div>
+    <div id="histDetail"><div class="card"><div class="empty"><div class="empty-icon">👈</div><p style="color:var(--warm-400);font-size:.78rem">点击左侧报告查看详情</p></div></div>
   </div>
 </div>
 
@@ -561,7 +561,7 @@ let chartInstances = {};
 // ===== INIT =====
 function init() {
   if (!currentUser || !currentUser.name) {
-    setTimeout(() => { openLoginModal(); try { document.getElementById('loginName').focus(); } catch(e) {} }, 400);
+    document.getElementById('userNameDisplay').textContent = '未登录';
   } else {
     document.getElementById('userNameDisplay').textContent = currentUser.name;
   }
@@ -1153,7 +1153,7 @@ function downloadPDF(histId) {
 // ===== HISTORY =====
 function renderHistory() {
   const el = document.getElementById('historyList');
-  if (!calcHistory.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">\ud83d\udcd0</div><p>\u6682\u65e0\u6d4b\u7b97\u5386\u53f2</p></div>'; return; }
+  if (!calcHistory.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">📑</div><p>完成测算并保存后，报告将出现在这里</p></div>'; return; }
   el.innerHTML = calcHistory.map(h => {
     const r = h.result;
     const dc = r.verdictColor || '#888';
