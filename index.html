@@ -317,8 +317,6 @@ td.ctr{text-align:center}
   .install-banner{padding:.6rem .8rem}
 }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/umd/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -1050,7 +1048,7 @@ function renderFullReport(h) {
     '<div class="report-actions no-print">' +
       '<div class="report-actions-left"><span class="report-badge">' + esc(r.hotelName) + '</span><span class="report-badge">' + r.calcTime + '</span><span class="report-badge">\u6d4b\u7b97\u4eba\uff1a' + esc(h.createdBy || '\u2014') + '</span></div>' +
       '<div style="display:flex;gap:.4rem">' +
-        '<button class="btn btn-teal btn-lg" onclick="_lastCalcHistId=\'' + esc(histId, true) + '\';downloadPDF()">\ud83d\udcbe \u4e0b\u8f7d PDF</button>' +
+        '<button class="btn btn-teal btn-lg" onclick="_lastCalcHistId=\'' + esc(h.id, true) + '\';downloadPDF()">\ud83d\udcbe \u4e0b\u8f7d PDF</button>' +
         '<button class="btn btn-ghost" onclick="window.print()">\ud83c\udf9f \u76f4\u63a5\u6253\u5370</button>' +
       '</div>' +
     '</div>' +
@@ -1149,45 +1147,93 @@ function rpt_drow(l, v, c) {
 // ===== PDF DOWNLOAD =====
 let _lastCalcHistId = null;
 function downloadPDF(histId) {
-  const hid = histId || _lastCalcHistId;
-  if (!hid || !calcHistory.length) { toast('请先完成测算', true); return; }
-  const h = calcHistory.find(x => x.id === hid);
-  if (!h) { toast('找不到测算记录', true); return; }
-  document.querySelector('.nav-btn[data-page="report"]').click();
-  renderFullReport(h);
-  toast('报告已生成，正在创建PDF…', false);
+  var hid = histId || _lastCalcHistId;
+  // Fallback: if report already rendered for current record, use its histId
+  if (!hid) {
+    var rc = document.getElementById('reportContent');
+    if (rc && rc.dataset.histId) { hid = rc.dataset.histId; }
+  }
+  if (!hid || !calcHistory.length) { toast('请先完成测算', true); console.warn('downloadPDF: 无hid或无history'); return; }
+  var h = calcHistory.find(function(x){return x.id === hid;});
+  if (!h) { toast('找不到测算记录', true); console.warn('downloadPDF: 找不到记录', hid); return; }
 
-  setTimeout(function() {
-    const docEl = document.querySelector('.report-document');
-    if (!docEl) { toast('报告未生成', true); return; }
-    const pages = docEl.querySelectorAll('.report-page');
-    if (!pages.length) { toast('报告内容为空', true); return; }
+  // Check CDN libraries
+  if (typeof html2canvas === 'undefined' || typeof window.jspdf === 'undefined') {
+    toast('PDF库加载中，请稍后再试', true);
+    console.error('downloadPDF: CDN库未加载 html2canvas=' + (typeof html2canvas) + ' jspdf=' + (typeof window.jspdf));
+    return;
+  }
 
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pdfW = pdf.internal.pageSize.getWidth();
-    let processed = 0;
-    const total = pages.length;
+  try {
+    // Switch to report tab if not already there
+    var reportBtn = document.querySelector('.nav-btn[data-page="report"]');
+    var reportPage = document.getElementById('page-report');
+    var needSwitch = !reportPage || !reportPage.classList.contains('active');
+    if (needSwitch && reportBtn) { reportBtn.click(); }
 
-    pages.forEach(function(pp, i) {
-      html2canvas(pp, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function(canvas) {
-        const imgW = pdfW;
-        const imgH = (canvas.height * pdfW) / canvas.width;
-        if (i > 0) pdf.addPage();
-        pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, imgH);
-        processed++;
-        if (processed === total) {
-          toast('PDF已下载', false);
-          pdf.save((h.result.hotelName || '酒店投资测算') + '_投资测算报告.pdf');
-        }
-      }).catch(function() {
-        processed++;
-        if (processed === total) {
-          toast('PDF生成失败，请尝试直接打印', true);
-        }
-      });
-    });
-  }, 800);
+    // Only re-render if different record or not yet rendered
+    var rc = document.getElementById('reportContent');
+    if (!rc || rc.dataset.histId !== h.id) { renderFullReport(h); }
+
+    toast('报告已生成，正在创建PDF…', false);
+
+    // Wait 2 frames for DOM to settle
+    var frames = 0, targetFrames = 4;
+    function waitAndCapture() {
+      frames++;
+      if (frames < targetFrames) { requestAnimationFrame(waitAndCapture); return; }
+
+      try {
+        var docEl = document.querySelector('.report-document');
+        if (!docEl) { toast('报告未生成', true); console.warn('downloadPDF: .report-document 未找到'); return; }
+        var pages = docEl.querySelectorAll('.report-page');
+        if (!pages.length) { toast('报告内容为空', true); console.warn('downloadPDF: 无.report-page'); return; }
+
+        var jsPDF = window.jspdf.jsPDF;
+        var pdf = new jsPDF('p', 'mm', 'a4');
+        var pdfW = pdf.internal.pageSize.getWidth();
+        var processed = 0;
+        var total = pages.length;
+        var failed = false;
+        console.log('downloadPDF: 开始生成, ' + total + ' 页');
+
+        pages.forEach(function(pp, i) {
+          html2canvas(pp, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function(canvas) {
+            try {
+              var imgW = pdfW;
+              var imgH = (canvas.height * pdfW) / canvas.width;
+              if (i > 0) pdf.addPage();
+              pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, imgW, imgH);
+              processed++;
+              if (processed === total && !failed) {
+                toast('PDF已下载', false);
+                var fname = (h.result.hotelName || '酒店投资测算') + '_投资测算报告.pdf';
+                console.log('downloadPDF: 完成, 文件名=', fname);
+                pdf.save(fname);
+              }
+            } catch(e2) {
+              failed = true;
+              console.error('downloadPDF: 添加图片失败', e2);
+              toast('PDF生成失败，请尝试直接打印', true);
+            }
+          }).catch(function(e) {
+            processed++;
+            console.error('downloadPDF: html2canvas失败 页' + (i+1), e);
+            if (!failed && processed >= total) {
+              toast('PDF生成失败（截图失败），请尝试直接打印', true);
+            }
+          });
+        });
+      } catch(e3) {
+        console.error('downloadPDF: 生成失败', e3);
+        toast('PDF生成失败: ' + (e3.message || '未知错误'), true);
+      }
+    }
+    requestAnimationFrame(waitAndCapture);
+  } catch(e) {
+    console.error('downloadPDF: 初始化失败', e);
+    toast('PDF生成失败', true);
+  }
 }
 
 // ===== HISTORY =====
@@ -1332,5 +1378,7 @@ function toast(msg, isErr) {
 })();
 </script>
 <!-- ___SHARED_DATA_PLACEHOLDER___ -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/umd/jspdf.umd.min.js" defer></script>
 </body>
 </html>
