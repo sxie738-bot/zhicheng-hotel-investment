@@ -155,11 +155,45 @@
   .verdict-banner .verdict-text{font-size:1.3rem;font-weight:700;display:inline-block;padding:.35rem 1.5rem;border-radius:var(--radius-sm);color:white}
 
   /* RESPONSIVE */
-  @media(max-width:768px){.dual,.form-row,.form-row-3{grid-template-columns:1fr}.header{padding:.7rem 1rem}}
+  @media(max-width:768px){
+    .dual,.form-row,.form-row-3{grid-template-columns:1fr}
+    .header{padding:.7rem 1rem}
+    .header h1{font-size:1rem}
+    .header .nav a{padding:.3rem .5rem;font-size:.75rem}
+    .container{padding:0 .6rem 2rem}
+    .tab-bar{overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;gap:0}
+    .tab-bar button{font-size:.75rem;padding:.5rem .8rem;white-space:nowrap;flex-shrink:0}
+    .card-header{flex-direction:column;align-items:flex-start;gap:.5rem}
+    .card-header .btn-sm{font-size:.75rem;padding:.3rem .7rem}
+    .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;font-size:.8rem}
+    .table-wrap table{min-width:600px}
+    .modal-overlay .modal-box{width:95vw;max-width:450px;padding:1rem;margin:1rem auto}
+    .toast{font-size:.8rem;bottom:1rem;left:1rem;right:1rem}
+    .verdict-banner .verdict-text{font-size:1rem}
+    .stat-value{font-size:1rem}
+    .kpi-grid{grid-template-columns:1fr 1fr;gap:.6rem}
+    .kpi-grid .kpi-card{padding:.6rem}
+    #addToHomeBar{bottom:.5rem;left:.5rem;right:.5rem;font-size:.75rem;padding:.6rem .8rem}
+  }
+
+  /* PWA Prompt Bar */
+  #addToHomeBar{display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
+    background:var(--navy);color:#fff;padding:.7rem 1.2rem;border-radius:var(--radius-lg);
+    font-size:.82rem;z-index:9999;box-shadow:0 4px 24px rgba(0,0,0,.25);
+    cursor:pointer;white-space:nowrap;align-items:center;gap:.6rem}
+  #addToHomeBar.show{display:flex}
+  #addToHomeBar .close-pwa{margin-left:.5rem;font-size:1.2rem;opacity:.7;cursor:pointer;line-height:1}
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 </style>
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="致城投资测算">
+<meta name="theme-color" content="#1a1a1c">
+<link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
+<div id="addToHomeBar">可将本页添加到主屏幕，像App一样使用 <span class="close-pwa" onclick="this.parentElement.remove()">×</span></div>
 
 <div class="header">
   <div class="header-brand">
@@ -420,6 +454,23 @@ function init() {
   fetch(API + '/api/ping').catch(() => showToast('无法连接服务器，请确认已通过 http://192.168.0.102:8088 访问', true));
   loadClients();
   loadClientOptions();
+
+  // PWA: show "Add to Home Screen" prompt on iOS/Android
+  const bar = document.getElementById('addToHomeBar');
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+  if (bar && isMobile && !isStandalone && !localStorage.getItem('pwa_prompt_dismissed')) {
+    setTimeout(() => { bar.classList.add('show'); }, 2500);
+    bar.addEventListener('click', (e) => {
+      if (e.target.classList.contains('close-pwa')) return;
+      localStorage.setItem('pwa_prompt_dismissed', '1');
+      bar.remove();
+    });
+    bar.querySelector('.close-pwa').addEventListener('click', () => {
+      localStorage.setItem('pwa_prompt_dismissed', '1');
+      bar.remove();
+    });
+  }
 }
 
 // ═══════════════ USER ═══════════════
@@ -661,7 +712,8 @@ function renderResult(r) {
     <div class="card">
       <div class="card-header">
         <h3>${esc(r.hotelName)} — 测算结果</h3>
-        <button class="btn btn-gold btn-sm" onclick="exportPDF('${r.calcId}')">导出 PDF 报告</button>
+        <button class="btn btn-gold btn-sm" onclick="exportPDF('${r.calcId}')">下载 PDF</button>
+        <button class="btn btn-outline btn-sm" onclick="printReport('${r.calcId}')">打印</button>
       </div>
       <div class="card-body">
         <div class="verdict-banner" style="background:${r.verdictColor}15">
@@ -736,17 +788,65 @@ function renderResult(r) {
   document.getElementById('calcResultPanel').innerHTML = html;
 }
 
-function exportPDF(calcId) {
+async function exportPDF(calcId) {
+  const url = API + '/api/export-pdf/' + calcId;
+  showToast('正在生成 PDF…');
+  try {
+    const r = await fetchWithRetry(url, {}, 3);
+    const blob = await r.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '致城酒店投资报告_' + calcId + '.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    showToast('PDF 下载完成');
+  } catch(e) {
+    showToast('下载失败：' + e.message, true);
+  }
+}
+
+async function printReport(calcId) {
   const url = API + '/api/export-report/' + calcId;
-  const w = window.open(url, '_blank');
-  if (w) {
-    w.onload = () => { setTimeout(() => w.print(), 500); };
-  } else {
-    window.open(url);
+  try {
+    const r = await fetchWithRetry(url, {}, 3);
+    const html = await r.text();
+    const w = window.open('', '_blank');
+    if (!w) { window.open(url); return; }
+    w.document.write(html);
+    w.document.close();
+    w.onload = () => { setTimeout(() => w.print(), 800); };
+  } catch(e) {
+    showToast('打印报告失败：' + e.message, true);
   }
 }
 
 // ═══════════════ UTILS ═══════════════
+
+// 带重试的 fetch，自动处理网络不稳定
+async function fetchWithRetry(url, options = {}, retries = 3) {
+  const delay = (attempt) => Math.min(1000 * Math.pow(2, attempt), 8000);
+  for (let i = 0; i < retries; i++) {
+    try {
+      const r = await fetch(url, options);
+      if (r.ok) return r;
+      if (r.status >= 400 && r.status < 500) throw new Error('服务器返回 ' + r.status); // 4xx 不重试
+      if (i < retries - 1) await new Promise(r => setTimeout(r, delay(i)));
+    } catch (e) {
+      if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
+        if (i < retries - 1) {
+          showToast(`连接失败，重试中 (${i + 2}/${retries})…`, true);
+          await new Promise(r => setTimeout(r, delay(i)));
+          continue;
+        }
+      }
+      throw e;
+    }
+  }
+  throw new Error('多次重试后仍无法连接');
+}
+
 function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 function showToast(msg, isError) {
   const t = document.getElementById('toast');
@@ -755,6 +855,9 @@ function showToast(msg, isError) {
 }
 
 init();
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js').catch(() => {});
+}
 </script>
 </body>
 </html>
