@@ -332,7 +332,7 @@ td.ctr{text-align:center}
     <button class="nav-btn" data-page="history">历史</button>
     <button class="nav-btn" data-page="report">报告</button>
     <div style="width:1px;height:14px;background:rgba(255,255,255,.12);margin:0 .15rem;flex-shrink:0"></div>
-    <div class="user-pill" id="userPill" onclick="openLoginModal()">
+    <div class="user-pill" id="userPill" onclick="openLoginModal()" style="font-size:.68rem;padding:.35rem .7rem;background:rgba(184,150,62,.15);border-color:rgba(184,150,62,.3);cursor:pointer">
       <span class="user-dot"></span>
       <span id="userNameDisplay">未登录</span>
     </div>
@@ -466,13 +466,17 @@ td.ctr{text-align:center}
 
 <!-- 登录弹窗 -->
 <div class="modal-overlay" id="loginModal" style="display:none">
-  <div class="modal" style="max-width:380px">
-    <div class="modal-head"><h3>请输入您的名字</h3><button class="modal-close" onclick="closeLoginModal()">×</button></div>
-    <div class="modal-body">
-      <p style="font-size:.72rem;color:var(--warm-500);margin-bottom:.6rem">用于记录录入人和认领人，客资数据保存在本设备</p>
-      <div class="fg"><label>您的名字</label><input id="loginName" placeholder="如：Shawn" onkeydown="if(event.key==='Enter')doLogin()"></div>
+  <div class="modal" style="max-width:360px">
+    <div class="modal-head"><h3>致城酒店投资测算</h3><button class="modal-close" onclick="closeLoginModal()">×</button></div>
+    <div class="modal-body" style="text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:.5rem">🏨</div>
+      <p style="font-size:.78rem;color:var(--warm-600);margin-bottom:.15rem;font-weight:600">欢迎使用</p>
+      <p style="font-size:.65rem;color:var(--warm-400);margin-bottom:1rem">输入姓名即开始，客资与测算记录存储在本地</p>
+      <div class="fg"><label>我的名字</label>
+        <input id="loginName" placeholder="输入您的名字，如：Shawn" autocomplete="name" onkeydown="if(event.key==='Enter')doLogin()" style="text-align:center;font-size:.9rem;padding:.55rem;border:2px solid var(--gold);border-radius:var(--radius-md)">
+      </div>
+      <button class="btn btn-gold btn-block" style="margin-top:.6rem;padding:.6rem" onclick="doLogin()">进入系统</button>
     </div>
-    <div class="modal-foot"><button class="btn btn-primary" onclick="doLogin()">确认</button></div>
   </div>
 </div>
 
@@ -557,7 +561,7 @@ let chartInstances = {};
 // ===== INIT =====
 function init() {
   if (!currentUser || !currentUser.name) {
-    setTimeout(() => openLoginModal(), 400);
+    setTimeout(() => { openLoginModal(); try { document.getElementById('loginName').focus(); } catch(e) {} }, 400);
   } else {
     document.getElementById('userNameDisplay').textContent = currentUser.name;
   }
@@ -587,6 +591,8 @@ function doLogin() {
   document.getElementById('userNameDisplay').textContent = name;
   closeLoginModal();
   renderClients();
+  renderHistory();
+  refreshLinkOptions();
   toast('欢迎，' + name);
 }
 
@@ -850,7 +856,7 @@ function runCalc() {
   let r; try { r = calcEngine(p); } catch (e) { return toast(e.message, true); }
   const cid = document.getElementById('linkClient').value;
   if (cid) { const c = clients.find(x => x.id === cid); if (c) { c.status = '\u5df2\u6d4b\u7b97'; c.updated_at = nowStr(); DB.set('clients', clients); } }
-  const histItem = { id: 'h_' + Date.now().toString(36), params: p, result: r, createdBy: currentUser.name, createdAt: nowStr() };
+  const linkedCid = document.getElementById('linkClient').value; const histItem = { id: 'h_' + Date.now().toString(36), params: p, result: r, createdBy: currentUser.name, createdAt: nowStr(), clientId: linkedCid || '' };
   calcHistory.unshift(histItem); if (calcHistory.length > 50) calcHistory = calcHistory.slice(0, 50);
   DB.set('calcHistory', calcHistory);
   renderCalcResult(r, histItem.id);
@@ -873,7 +879,7 @@ function renderCalcResult(r, histId) {
       '<div class="card-header"><h3>' + esc(r.hotelName) + ' \u2014 \u6d4b\u7b97\u62a5\u544a</h3>' +
         '<div style="display:flex;gap:.4rem;flex-wrap:wrap">' +
           '<button class="btn btn-gold btn-sm" onclick="viewReport(\'' + esc(histId, true) + '\')">\ud83d\udcd1 \u5b8c\u6574\u62a5\u544a</button>' +
-          '<button class="btn btn-teal btn-sm" onclick="downloadPDF()">\ud83d\udcbe \u4e0b\u8f7d PDF</button>' +
+          '<button class="btn btn-teal btn-sm" onclick="_lastCalcHistId=' + esc(histId, true) + ';downloadPDF()">\ud83d\udcbe \u4e0b\u8f7d PDF</button>' +
           '<button class="btn btn-ghost btn-sm" onclick="copyResult(\'' + esc(histId, true) + '\')">\ud83d\udccb \u590d\u5236\u6458\u8981</button>' +
         '</div>' +
       '</div>' +
@@ -1042,7 +1048,7 @@ function renderFullReport(h) {
     '<div class="report-actions no-print">' +
       '<div class="report-actions-left"><span class="report-badge">' + esc(r.hotelName) + '</span><span class="report-badge">' + r.calcTime + '</span><span class="report-badge">\u6d4b\u7b97\u4eba\uff1a' + esc(h.createdBy || '\u2014') + '</span></div>' +
       '<div style="display:flex;gap:.4rem">' +
-        '<button class="btn btn-teal btn-lg" onclick="downloadPDF()">\ud83d\udcbe \u4e0b\u8f7d PDF</button>' +
+        '<button class="btn btn-teal btn-lg" onclick="_lastCalcHistId=' + esc(histId, true) + ';downloadPDF()">\ud83d\udcbe \u4e0b\u8f7d PDF</button>' +
         '<button class="btn btn-ghost" onclick="window.print()">\ud83c\udf9f \u76f4\u63a5\u6253\u5370</button>' +
       '</div>' +
     '</div>' +
@@ -1132,11 +1138,16 @@ function rpt_drow(l, v, c) {
 }
 
 // ===== PDF DOWNLOAD =====
-function downloadPDF() {
-  const repEl = document.getElementById('reportContent');
-  if (!repEl || !repEl.querySelector('.report-document')) { toast('\u8bf7\u5148\u751f\u6210\u6d4b\u7b97\u62a5\u544a', true); return; }
-  toast('\u6b63\u5728\u6253\u5f00\u6253\u5370\u5bf9\u8bdd\u6846\uff0c\u8bf7\u9009\u62e9\u300c\u53e6\u5b58\u4e3a PDF\u300d', false);
-  setTimeout(() => { window.print(); }, 500);
+let _lastCalcHistId = null;
+function downloadPDF(histId) {
+  const hid = histId || _lastCalcHistId;
+  if (!hid || !calcHistory.length) { toast('\u8bf7\u5148\u5b8c\u6210\u6d4b\u7b97', true); return; }
+  const h = calcHistory.find(x => x.id === hid);
+  if (!h) { toast('\u627e\u4e0d\u5230\u6d4b\u7b97\u8bb0\u5f55', true); return; }
+  document.querySelector('.nav-btn[data-page="report"]').click();
+  renderFullReport(h);
+  toast('\u62a5\u544a\u5df2\u751f\u6210\uff0c\u6b63\u5728\u6253\u5f00\u6253\u5370\u5bf9\u8bdd\u6846\u2026', false);
+  setTimeout(() => { window.print(); }, 600);
 }
 
 // ===== HISTORY =====
@@ -1147,10 +1158,12 @@ function renderHistory() {
     const r = h.result;
     const dc = r.verdictColor || '#888';
     const hid = esc(h.id, true);
+    var cliTag = '';
+    if (h.clientId) { var cl = clients.find(function(x){return x.id===h.clientId;}); if (cl) cliTag = cl.hotel_name + ' · ' + cl.status + (cl.claimed_by_name ? ' · 认领:' + cl.claimed_by_name : ' · 未认领'); }
     return '<div class="hist-item" onclick="loadHistory(\'' + hid + '\')">' +
       '<div class="hist-dot" style="background:' + dc + '"></div>' +
       '<div><div class="hist-name">' + esc(r.hotelName) + '</div>' +
-        '<div class="hist-meta">' + h.createdAt + ' \u00b7 ' + (h.createdBy || '\u2014') + '</div></div>' +
+        '<div class="hist-meta">' + h.createdAt + ' · ' + esc(h.createdBy || '—') + (cliTag ? ' <span class="badge badge-blue" style="font-size:.55rem">客资:' + esc(cliTag) + '</span>' : '') + '</div></div>' +
       '<div style="margin-left:auto;text-align:right"><div class="hist-roi" style="color:' + dc + '">' + r.verdict + '</div>' +
         '<div style="font-size:.6rem;color:var(--warm-400)">ROI ' + (r.roiS === 999 ? '\u221e' : r.roiS.toFixed(1)) + '\u5e74</div></div>' +
     '</div>';
