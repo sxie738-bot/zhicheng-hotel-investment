@@ -2,862 +2,1269 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>致城酒店投资测算系统</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap');
-  :root {
-    --ink: #1a1a1c; --ink-soft: #2d2d31; --paper: #faf9f6;
-    --warm-50: #f5f3f0; --warm-100: #ebe7e2; --warm-200: #d6d1ca; --warm-300: #b8b2a9;
-    --warm-400: #9a9389; --warm-500: #7d756a; --warm-600: #60594f;
-    --gold: #b8963e; --gold-light: #d4b96a; --gold-dim: #8a6d2e;
-    --burgundy: #7a2e3f; --teal: #2d6a5e; --teal-light: #3d8a7b;
-    --navy: #1e3a5f; --navy-light: #2a5080;
-    --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px;
-    --shadow: 0 1px 3px rgba(0,0,0,.06),0 3px 12px rgba(0,0,0,.04);
-    --font: 'Noto Sans SC', system-ui, sans-serif;
-    --font-display: 'DM Serif Display', 'Noto Sans SC', serif;
-    --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
-  }
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  html{font-size:15px;scroll-behavior:smooth}
-  body{font-family:var(--font);background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
-  button{font-family:var(--font);cursor:pointer}
-  input,select,textarea{font-family:var(--font)}
-  a{color:var(--navy);text-decoration:none}
-
-  /* HEADER */
-  .header{background:linear-gradient(135deg,var(--ink) 0%,var(--ink-soft) 100%);padding:0.9rem 1.8rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;border-bottom:3px solid var(--gold);position:sticky;top:0;z-index:50}
-  .header-brand{display:flex;align-items:center;gap:0.75rem}
-  .header-logo{width:36px;height:36px;background:var(--gold);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1.2rem;color:var(--ink);font-weight:700}
-  .header h1{font-family:var(--font-display);font-size:1.2rem;font-weight:400;color:var(--paper);letter-spacing:.02em}
-  .header .sub{font-size:0.65rem;color:var(--warm-400)}
-  .header-right{display:flex;align-items:center;gap:0.75rem}
-  .header-right .user-tag{display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;color:var(--warm-300);background:rgba(255,255,255,.08);padding:0.35rem 0.7rem;border-radius:100px}
-  .header-right .user-tag .dot{width:6px;height:6px;border-radius:50%;background:var(--gold)}
-  .btn-sm{padding:0.35rem 0.75rem;font-size:0.7rem;border-radius:var(--radius-sm);border:none;font-weight:600;letter-spacing:.03em;transition:all .15s}
-  .btn-gold{background:var(--gold);color:var(--ink)}
-  .btn-gold:hover{background:var(--gold-light)}
-  .btn-outline{background:transparent;color:var(--warm-300);border:1px solid var(--warm-600)}
-  .btn-outline:hover{color:var(--paper);border-color:var(--warm-300)}
-  .btn-nav{background:transparent;color:var(--paper);border:none;font-size:0.75rem;padding:0.35rem 0.6rem;border-radius:var(--radius-sm);font-weight:500;letter-spacing:.02em;transition:all .15s}
-  .btn-nav:hover{background:rgba(255,255,255,.1)}
-  .btn-nav.active{background:var(--gold);color:var(--ink)}
-
-  /* LAYOUT */
-  .container{max-width:1440px;margin:0 auto;padding:1.25rem 1.5rem}
-  .tabs{display:flex;gap:0;margin-bottom:1.25rem;border-bottom:2px solid var(--warm-200)}
-  .tab-btn{padding:0.6rem 1.5rem;border:none;background:none;font-size:0.8rem;font-weight:600;color:var(--warm-400);letter-spacing:.03em;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
-  .tab-btn:hover{color:var(--ink)}
-  .tab-btn.active{color:var(--ink);border-bottom-color:var(--gold)}
-
-  /* PAGE PANELS */
-  .page{display:none}
-  .page.active{display:block}
-
-  /* CARDS */
-  .card{background:white;border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;margin-bottom:1.25rem}
-  .card-header{padding:0.85rem 1.25rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--warm-100)}
-  .card-header h3{font-size:0.75rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink)}
-  .card-body{padding:1.25rem}
-
-  /* GRID */
-  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:1.25rem}
-  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem}
-  .grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.25rem}
-
-  /* FORM */
-  .form-group{margin-bottom:0.75rem}
-  .form-group label{display:block;font-size:0.68rem;font-weight:600;color:var(--warm-500);margin-bottom:0.25rem;letter-spacing:.03em;text-transform:uppercase}
-  .form-group input,.form-group select,.form-group textarea{width:100%;padding:0.5rem 0.65rem;border:1.5px solid var(--warm-200);border-radius:var(--radius-sm);font-size:0.82rem;color:var(--ink);background:var(--warm-50);transition:border-color .15s,box-shadow .15s}
-  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,150,62,.12);background:white}
-  .form-group textarea{min-height:70px;resize:vertical}
-  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem}
-  .form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem}
-  .input-unit{font-size:0.65rem;color:var(--warm-400)}
-
-  /* BUTTONS */
-  .btn{padding:0.55rem 1.25rem;font-size:0.75rem;border-radius:var(--radius-sm);border:none;font-weight:600;letter-spacing:.03em;transition:all .15s}
-  .btn-primary{background:var(--navy);color:white}
-  .btn-primary:hover{background:var(--navy-light)}
-  .btn-warn{background:var(--burgundy);color:white}
-  .btn-warn:hover{background:#962a3f}
-  .btn-ghost{background:transparent;color:var(--warm-500);border:1px solid var(--warm-200)}
-  .btn-ghost:hover{border-color:var(--warm-400);color:var(--ink)}
-  .btn-block{display:block;width:100%}
-  .btn-lg{padding:0.7rem 2rem;font-size:0.85rem}
-
-  /* TABLE */
-  .table-wrap{overflow-x:auto}
-  table{width:100%;border-collapse:collapse;font-size:0.78rem}
-  thead th{background:var(--warm-50);padding:.55rem .75rem;text-align:left;font-weight:600;font-size:.65rem;letter-spacing:.04em;text-transform:uppercase;color:var(--warm-500);border-bottom:2px solid var(--warm-200);white-space:nowrap}
-  tbody td{padding:.55rem .75rem;border-bottom:1px solid var(--warm-100)}
-  tbody tr:hover{background:var(--warm-50)}
-  td.num{font-family:var(--font-mono);text-align:right;font-size:.75rem}
-
-  /* BADGES */
-  .badge{display:inline-block;padding:0.15rem 0.5rem;border-radius:100px;font-size:0.62rem;font-weight:700;letter-spacing:.04em}
-  .badge-green{background:#e6f4ee;color:var(--teal)}
-  .badge-red{background:#fdecee;color:var(--burgundy)}
-  .badge-gold{background:#fdf5e6;color:var(--gold-dim)}
-  .badge-gray{background:var(--warm-100);color:var(--warm-500)}
-  .badge-blue{background:#e8eff7;color:var(--navy)}
-
-  /* KPI */
-  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--warm-100)}
-  .kpi-item{background:white;padding:1rem 1rem .85rem}
-  .kpi-label{font-size:.62rem;font-weight:600;color:var(--warm-500);letter-spacing:.05em;text-transform:uppercase}
-  .kpi-value{font-family:var(--font-mono);font-size:1.15rem;font-weight:600;color:var(--ink);margin-top:2px}
-  .kpi-sub{font-size:.62rem;color:var(--warm-400);margin-top:1px}
-
-  /* SEASON BOXES */
-  .season-box{padding:0.55rem 0.7rem;border-radius:var(--radius-sm);border-left:3px solid;margin-bottom:0.5rem}
-  .season-box.peak{background:#f0f8f5;border-color:var(--teal)}
-  .season-box.mid{background:#faf9f6;border-color:var(--gold)}
-  .season-box.low{background:#fdf5f4;border-color:var(--burgundy)}
-  .season-box .season-title{font-size:.62rem;font-weight:700;letter-spacing:.06em;margin-bottom:.3rem}
-  .season-box.peak .season-title{color:var(--teal)}
-  .season-box.mid .season-title{color:var(--gold-dim)}
-  .season-box.low .season-title{color:var(--burgundy)}
-
-  /* MODAL */
-  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:100;animation:fadeIn .15s}
-  .modal{background:white;border-radius:var(--radius-lg);box-shadow:0 8px 40px rgba(0,0,0,.15);width:90%;max-width:500px;max-height:80vh;overflow-y:auto}
-  .modal-header{padding:1rem 1.25rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--warm-100)}
-  .modal-header h3{font-size:.85rem;font-weight:700}
-  .modal-close{background:none;border:none;font-size:1.2rem;color:var(--warm-400);cursor:pointer}
-  .modal-body{padding:1.25rem}
-  .modal-footer{padding:0.75rem 1.25rem;border-top:1px solid var(--warm-100);display:flex;justify-content:flex-end;gap:0.5rem}
-
-  /* TOAST */
-  .toast{position:fixed;bottom:2rem;right:2rem;background:var(--ink-soft);color:var(--paper);padding:.65rem 1.25rem;border-radius:var(--radius-sm);font-size:.75rem;box-shadow:0 4px 20px rgba(0,0,0,.2);opacity:0;transform:translateY(10px);transition:all .25s;z-index:200;pointer-events:none}
-  .toast.show{opacity:1;transform:translateY(0)}
-  .toast.error{background:var(--burgundy)}
-
-  /* DUAL COMPARISON */
-  .dual{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
-  .dual-col{border-radius:var(--radius-md);padding:1rem}
-  .dual-col.stable{background:#f4faf7;border:1px solid #d0e8de}
-  .dual-col.cons{background:#fdf8f7;border:1px solid #f0d8d4}
-  .dual-col h4{font-size:.75rem;font-weight:700;letter-spacing:.04em;margin-bottom:.75rem}
-  .dual-col.stable h4{color:var(--teal)}
-  .dual-col.cons h4{color:var(--burgundy)}
-  .dual-row{display:flex;justify-content:space-between;padding:.35rem 0;border-bottom:1px solid rgba(0,0,0,.04);font-size:.75rem}
-  .dual-row .lbl{color:var(--warm-500)}
-  .dual-row .val{font-family:var(--font-mono);font-weight:500}
-
-  /* EMPTY / LOADING */
-  .empty{text-align:center;padding:3rem 1.5rem;color:var(--warm-300)}
-  .empty .icon{font-size:2.5rem;margin-bottom:.5rem;opacity:.5}
-
-  /* VERDICT */
-  .verdict-banner{text-align:center;padding:1rem;border-radius:var(--radius-md);margin-bottom:1rem}
-  .verdict-banner .verdict-text{font-size:1.3rem;font-weight:700;display:inline-block;padding:.35rem 1.5rem;border-radius:var(--radius-sm);color:white}
-
-  /* RESPONSIVE */
-  @media(max-width:768px){
-    .dual,.form-row,.form-row-3{grid-template-columns:1fr}
-    .header{padding:.7rem 1rem}
-    .header h1{font-size:1rem}
-    .header .nav a{padding:.3rem .5rem;font-size:.75rem}
-    .container{padding:0 .6rem 2rem}
-    .tab-bar{overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;gap:0}
-    .tab-bar button{font-size:.75rem;padding:.5rem .8rem;white-space:nowrap;flex-shrink:0}
-    .card-header{flex-direction:column;align-items:flex-start;gap:.5rem}
-    .card-header .btn-sm{font-size:.75rem;padding:.3rem .7rem}
-    .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;font-size:.8rem}
-    .table-wrap table{min-width:600px}
-    .modal-overlay .modal-box{width:95vw;max-width:450px;padding:1rem;margin:1rem auto}
-    .toast{font-size:.8rem;bottom:1rem;left:1rem;right:1rem}
-    .verdict-banner .verdict-text{font-size:1rem}
-    .stat-value{font-size:1rem}
-    .kpi-grid{grid-template-columns:1fr 1fr;gap:.6rem}
-    .kpi-grid .kpi-card{padding:.6rem}
-    #addToHomeBar{bottom:.5rem;left:.5rem;right:.5rem;font-size:.75rem;padding:.6rem .8rem}
-  }
-
-  /* PWA Prompt Bar */
-  #addToHomeBar{display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
-    background:var(--navy);color:#fff;padding:.7rem 1.2rem;border-radius:var(--radius-lg);
-    font-size:.82rem;z-index:9999;box-shadow:0 4px 24px rgba(0,0,0,.25);
-    cursor:pointer;white-space:nowrap;align-items:center;gap:.6rem}
-  #addToHomeBar.show{display:flex}
-  #addToHomeBar .close-pwa{margin-left:.5rem;font-size:1.2rem;opacity:.7;cursor:pointer;line-height:1}
-  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-</style>
-<link rel="manifest" href="manifest.json">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="theme-color" content="#1a1a1c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="致城投资测算">
-<meta name="theme-color" content="#1a1a1c">
-<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-title" content="致城测算">
+<title>致城酒店投资测算系统 v4</title>
+<style>
+:root{
+  --ink:#1a1a1c;--ink-soft:#2d2d31;--paper:#faf9f6;
+  --warm-50:#f5f3f0;--warm-100:#ebe7e2;--warm-200:#d6d1ca;
+  --warm-300:#b8b2a9;--warm-400:#9a9389;--warm-500:#7d756a;--warm-600:#60594f;
+  --gold:#b8963e;--gold-light:#d4b96a;--gold-dim:#8a6d2e;--gold-bg:#fdf5e6;
+  --burgundy:#7a2e3f;--teal:#2d6a5e;--teal-light:#3d8a7b;
+  --navy:#1e3a5f;--navy-light:#2a5080;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.05);
+  --font:'PingFang SC','Microsoft YaHei','Noto Sans SC',system-ui,sans-serif;
+  --font-mono:'SF Mono','JetBrains Mono','Menlo',monospace;
+  --transition:all .2s cubic-bezier(.4,0,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:15px;scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--font);background:var(--paper);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button,input,select,textarea{font-family:var(--font);font-size:inherit}
+button{cursor:pointer;border:none;background:none;-webkit-tap-highlight-color:transparent}
+a{text-decoration:none;color:inherit}
+
+/* HEADER */
+.header{
+  background:linear-gradient(135deg,var(--ink) 0%,var(--ink-soft) 100%);
+  padding:0 1rem;height:56px;display:flex;align-items:center;
+  justify-content:space-between;border-bottom:3px solid var(--gold);
+  position:sticky;top:0;z-index:50;
+}
+.header-brand{display:flex;align-items:center;gap:.5rem}
+.header-logo{
+  width:32px;height:32px;background:var(--gold);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;color:var(--ink);font-weight:700;flex-shrink:0;
+}
+.header-title{font-size:.95rem;font-weight:600;color:#fff;letter-spacing:.03em}
+.header-nav{display:flex;align-items:center;gap:.15rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.nav-btn{
+  padding:.35rem .6rem;color:rgba(255,255,255,.65);font-size:.68rem;
+  font-weight:600;border-radius:var(--radius-sm);letter-spacing:.04em;
+  transition:var(--transition);white-space:nowrap;flex-shrink:0;
+}
+.nav-btn:hover{color:#fff;background:rgba(255,255,255,.1)}
+.nav-btn.active{background:var(--gold);color:var(--ink)}
+.user-pill{
+  display:flex;align-items:center;gap:.3rem;font-size:.62rem;
+  color:var(--warm-300);background:rgba(255,255,255,.07);
+  padding:.25rem .5rem;border-radius:100px;cursor:pointer;
+  transition:var(--transition);border:1px solid rgba(255,255,255,.1);white-space:nowrap;
+}
+.user-pill:hover{background:rgba(255,255,255,.12)}
+.user-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0}
+
+/* LAYOUT */
+.container{max-width:1200px;margin:0 auto;padding:1rem}
+.page{display:none}.page.active{display:block}
+
+/* CARDS */
+.card{
+  background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow);
+  overflow:hidden;margin-bottom:1rem;border:1px solid rgba(0,0,0,.04);
+}
+.card-header{
+  padding:.8rem 1rem;display:flex;align-items:center;
+  justify-content:space-between;flex-wrap:wrap;gap:.5rem;
+  border-bottom:1px solid var(--warm-100);background:#fff;
+}
+.card-header h3{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+.card-body{padding:1rem}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr;gap:1rem}
+@media(min-width:900px){.g2{grid-template-columns:repeat(auto-fit,minmax(420px,1fr))}}
+.g3{display:grid;grid-template-columns:1fr;gap:.75rem}
+@media(min-width:700px){.g3{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}}
+.g4{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem}
+@media(min-width:700px){.g4{grid-template-columns:repeat(4,1fr)}}
+.dual{grid-template-columns:1fr;gap:1rem}
+@media(min-width:768px){.dual{grid-template-columns:1fr 1fr}}
+
+/* TABS */
+.tab-bar{display:flex;gap:0;margin-bottom:1.2rem;border-bottom:2px solid var(--warm-200);overflow-x:auto}
+.tab-btn{
+  padding:.55rem 1rem;font-size:.72rem;font-weight:600;color:var(--warm-400);
+  letter-spacing:.04em;border-bottom:2px solid transparent;
+  margin-bottom:-2px;transition:var(--transition);white-space:nowrap;
+}
+.tab-btn:hover{color:var(--ink)}
+.tab-btn.active{color:var(--ink);border-bottom-color:var(--gold)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+
+/* FORM */
+.form-section{background:var(--warm-50);border-radius:var(--radius-md);padding:.8rem;margin-bottom:.75rem}
+.form-section-label{font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:.5rem}
+.fg{margin-bottom:.6rem}
+.fg label{display:block;font-size:.64rem;font-weight:600;color:var(--warm-500);margin-bottom:.25rem;letter-spacing:.03em;text-transform:uppercase}
+.fg input,.fg select,.fg textarea{
+  width:100%;padding:.5rem .65rem;border:1.5px solid var(--warm-200);
+  border-radius:var(--radius-sm);font-size:.82rem;color:var(--ink);
+  background:#fff;transition:var(--transition);appearance:none;-webkit-appearance:none;
+}
+.fg select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%239a9389' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .5rem center;padding-right:1.8rem}
+.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,150,62,.12)}
+.fg textarea{min-height:60px;resize:vertical}
+.fr2{display:grid;grid-template-columns:1fr;gap:.5rem}
+@media(min-width:600px){.fr2{grid-template-columns:1fr 1fr}}
+.fr3{display:grid;grid-template-columns:1fr;gap:.5rem}
+@media(min-width:600px){.fr3{grid-template-columns:1fr 1fr 1fr}}
+.unit{font-size:.6rem;color:var(--warm-400);font-weight:400}
+
+/* SEASON BOXES */
+.season-box{padding:.5rem .65rem;border-radius:var(--radius-sm);border-left:3px solid;margin-bottom:.45rem}
+.season-box.peak{background:#f0f8f5;border-color:var(--teal)}
+.season-box.mid{background:var(--gold-bg);border-color:var(--gold)}
+.season-box.low{background:#fdf5f4;border-color:var(--burgundy)}
+.season-title{font-size:.6rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:.35rem}
+.peak .season-title{color:var(--teal)}.mid .season-title{color:var(--gold-dim)}.low .season-title{color:var(--burgundy)}
+
+/* BUTTONS */
+.btn{
+  padding:.5rem 1rem;font-size:.73rem;border-radius:var(--radius-sm);
+  font-weight:600;letter-spacing:.04em;transition:var(--transition);
+  display:inline-flex;align-items:center;gap:.3rem;border:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:var(--navy-light)}
+.btn-gold{background:var(--gold);color:var(--ink)}.btn-gold:hover{background:var(--gold-light)}
+.btn-warn{background:var(--burgundy);color:#fff}.btn-warn:hover{filter:brightness(1.15)}
+.btn-ghost{background:transparent;color:var(--warm-500);border:1.5px solid var(--warm-200)}
+.btn-ghost:hover{border-color:var(--warm-400);color:var(--ink)}
+.btn-teal{background:var(--teal);color:#fff}.btn-teal:hover{background:var(--teal-light)}
+.btn-sm{padding:.3rem .6rem;font-size:.65rem}
+.btn-lg{padding:.65rem 1.8rem;font-size:.82rem}
+.btn-block{display:flex;width:100%;justify-content:center}
+.btn-outline-primary{background:transparent;color:var(--navy);border:2px solid var(--navy)}
+.btn-outline-primary:hover{background:var(--navy);color:#fff}
+.btn-install{
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  color:var(--ink);font-weight:700;font-size:.68rem;
+  padding:.35rem .7rem;border-radius:var(--radius-sm);
+  display:inline-flex;align-items:center;gap:.25rem;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(184,150,62,.3)}50%{box-shadow:0 0 0 6px rgba(184,150,62,0)}}
+.btn-install-x{background:none;border:none;color:var(--ink);font-size:.9rem;padding:0 .2rem;cursor:pointer;opacity:.5}
+.btn-install-x:hover{opacity:1}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.76rem}
+thead th{background:var(--warm-50);padding:.45rem .6rem;text-align:left;font-weight:700;font-size:.6rem;letter-spacing:.05em;text-transform:uppercase;color:var(--warm-500);border-bottom:2px solid var(--warm-200);white-space:nowrap}
+tbody td{padding:.45rem .6rem;border-bottom:1px solid var(--warm-100)}
+tbody tr:hover{background:var(--warm-50)}
+td.num{font-family:var(--font-mono);text-align:right;font-size:.72rem}
+td.ctr{text-align:center}
+
+/* BADGES */
+.badge{display:inline-block;padding:.1rem .4rem;border-radius:100px;font-size:.58rem;font-weight:700;letter-spacing:.04em}
+.badge-green{background:#e6f4ee;color:var(--teal)}.badge-red{background:#fdecee;color:var(--burgundy)}
+.badge-gold{background:var(--gold-bg);color:var(--gold-dim)}.badge-gray{background:var(--warm-100);color:var(--warm-500)}
+.badge-blue{background:#e8eff7;color:var(--navy)}
+
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--warm-100);border-radius:var(--radius-md);overflow:hidden;margin-bottom:1.2rem;border:1px solid var(--warm-100)}
+@media(min-width:600px){.kpi-strip{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}}
+.kpi-cell{background:#fff;padding:.7rem .8rem .6rem;transition:var(--transition)}
+.kpi-cell:hover{background:var(--warm-50)}
+.kpi-lbl{font-size:.58rem;font-weight:600;color:var(--warm-500);letter-spacing:.05em;text-transform:uppercase}
+.kpi-val{font-family:var(--font-mono);font-size:1.05rem;font-weight:600;color:var(--ink);margin-top:2px}
+.kpi-sub{font-size:.55rem;color:var(--warm-400);margin-top:1px}
+
+/* VERDICT */
+.verdict-wrap{text-align:center;padding:.8rem 1rem .4rem;margin-bottom:.8rem}
+.verdict-badge{display:inline-block;padding:.35rem 1.8rem;border-radius:var(--radius-sm);font-size:1.1rem;font-weight:700;color:#fff;letter-spacing:.04em}
+.verdict-meta{font-size:.62rem;color:var(--warm-400);margin-top:.35rem}
+
+/* DUAL COMPARE */
+.dual-col{border-radius:var(--radius-md);padding:.75rem .8rem}
+.dual-col.stable{background:#f0f8f5;border:1px solid #d0e8de}
+.dual-col.cons{background:#fdf8f7;border:1px solid #f0d8d4}
+.dual-col h4{font-size:.7rem;font-weight:700;letter-spacing:.05em;margin-bottom:.5rem}
+.stable h4{color:var(--teal)}.cons h4{color:var(--burgundy)}
+.d-row{display:flex;justify-content:space-between;align-items:center;padding:.25rem 0;border-bottom:1px solid rgba(0,0,0,.04);font-size:.72rem}
+.d-row:last-child{border-bottom:none}
+.d-lbl{color:var(--warm-500)}.d-val{font-family:var(--font-mono);font-weight:600;font-size:.7rem}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--warm-300)}
+.empty-icon{font-size:2.2rem;opacity:.4;margin-bottom:.4rem}
+
+/* CHART */
+.chart-wrap{position:relative;height:220px;margin-bottom:.5rem}
+@media(min-width:768px){.chart-wrap{height:260px}}
+
+/* HISTORY LIST */
+.hist-item{display:flex;align-items:center;gap:.5rem;padding:.5rem .6rem;border-radius:var(--radius-sm);cursor:pointer;transition:var(--transition);border:1px solid transparent}
+.hist-item:hover{background:var(--warm-50);border-color:var(--warm-200)}
+.hist-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.hist-name{font-size:.75rem;font-weight:600;color:var(--ink)}.hist-meta{font-size:.62rem;color:var(--warm-400)}
+.hist-roi{font-family:var(--font-mono);font-size:.72rem;font-weight:600}
+
+/* REPORT */
+.report-actions{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1rem;padding:.8rem 1rem;background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.04);align-items:center;justify-content:space-between}
+.report-actions-left{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
+.report-badge{font-size:.62rem;color:var(--warm-500);padding:.25rem .6rem;background:var(--warm-50);border-radius:100px}
+
+/* Report Document */
+.report-document{max-width:210mm;margin:0 auto;background:#fff;padding:0;box-shadow:var(--shadow);border-radius:var(--radius-lg);border:1px solid rgba(0,0,0,.04);overflow:hidden}
+.report-page{padding:16mm 14mm}
+.rpt-title{font-size:22px;font-weight:700;color:var(--navy);margin-bottom:3px;letter-spacing:.04em;line-height:1.3}
+.rpt-subtitle{font-size:16px;font-weight:400;color:var(--ink);margin-bottom:2px}
+.rpt-meta{font-size:9px;color:var(--warm-400);line-height:1.8}
+.rpt-divider{border:none;height:2px;background:var(--gold);margin:14px 0 8px}
+.rpt-section-title{font-size:12px;font-weight:700;color:var(--navy);letter-spacing:.06em;padding-bottom:4px;margin:18px 0 8px;border-bottom:2px solid var(--gold)}
+.rpt-verdict-wrap{text-align:center;margin:12px 0 16px}
+.rpt-verdict{display:inline-block;padding:5px 28px;border-radius:5px;font-size:16px;font-weight:700;color:#fff;letter-spacing:.08em}
+.rpt-kpi-grid{display:flex;flex-wrap:wrap;gap:1px;background:#ddd;margin:8px 0 14px;border:1px solid #ddd;border-radius:4px;overflow:hidden}
+.rpt-kpi-card{flex:1;min-width:120px;background:#fff;padding:7px 9px}
+.rpt-kpi-card .rk-l{font-size:7px;color:#999;text-transform:uppercase;letter-spacing:.05em}
+.rpt-kpi-card .rk-v{font-family:var(--font-mono);font-size:14px;font-weight:700;margin-top:1px}
+.rpt-kpi-card .rk-s{font-size:7px;color:#bbb}
+.rpt-dual{display:flex;gap:10px;margin:8px 0 12px}
+.rpt-dual>div{flex:1;padding:8px 10px;border-radius:6px}
+.rpt-stable{background:#f0f8f5;border:1px solid #d0e8de}
+.rpt-cons{background:#fef7f5;border:1px solid #f0d8d4}
+.rpt-dual h4{font-size:10px;font-weight:700;margin-bottom:6px;letter-spacing:.03em}
+.rpt-stable h4{color:var(--teal)}.rpt-cons h4{color:var(--burgundy)}
+.rpt-drow{display:flex;justify-content:space-between;font-size:9px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.06);font-family:var(--font-mono)}
+.rpt-drow:last-child{border-bottom:none}
+.rpt-drow .rpt-dl{font-family:var(--font);color:#666}
+.rpt-table{width:100%;border-collapse:collapse;margin:6px 0 12px;font-size:9px}
+.rpt-table th{background:var(--warm-50);padding:4px 7px;text-align:left;font-size:7px;text-transform:uppercase;color:#888;border-bottom:2px solid #ccc;letter-spacing:.05em}
+.rpt-table td{padding:4px 7px;border-bottom:1px solid #eee}
+.rpt-table td.num{text-align:right;font-family:var(--font-mono)}
+.rpt-table tr.subtotal td{font-weight:700;background:var(--warm-50)}
+.rpt-footer{margin-top:14px;padding-top:8px;border-top:1px solid #ddd;font-size:7px;color:#bbb;text-align:center}
+.rpt-note{padding:6px 10px;background:var(--gold-bg);border-radius:4px;border-left:3px solid var(--gold);margin:8px 0;font-size:9px;color:var(--gold-dim)}
+
+/* PRINT */
+@media print{
+  @page{size:A4;margin:0}
+  html,body{background:#fff!important;margin:0;padding:0}
+  .no-print{display:none!important}
+  .report-document{display:block!important;max-width:none!important;box-shadow:none!important;border-radius:0!important;border:none!important;margin:0!important;padding:0!important}
+  .report-page{display:block!important;padding:14mm 12mm!important;page-break-after:always;border:none!important}
+  .report-page:last-child{page-break-after:auto}
+  .rpt-table{page-break-inside:avoid}
+  .rpt-section-title{page-break-after:avoid}
+  .rpt-kpi-grid{page-break-inside:avoid}
+  .rpt-dual{page-break-inside:avoid}
+}
+
+/* INSTALL BANNER */
+.install-banner{
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:linear-gradient(135deg,var(--ink),var(--ink-soft));
+  color:#fff;padding:.7rem 1rem;display:none;align-items:center;gap:.6rem;
+  box-shadow:0 -2px 12px rgba(0,0,0,.15);
+  border-top:2px solid var(--gold);
+}
+.install-banner.show{display:flex}
+.install-banner-text{flex:1;font-size:.72rem;font-weight:600}
+.install-banner-sub{font-size:.58rem;color:var(--warm-300);font-weight:400;margin-top:1px}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(10px) scale(.98);opacity:0;background:var(--ink-soft);color:var(--paper);padding:.5rem 1rem;border-radius:var(--radius-sm);font-size:.7rem;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.18);z-index:200;pointer-events:none;transition:all .25s;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}.toast.err{background:var(--burgundy)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:flex-end;justify-content:center;z-index:100;animation:fadeIn .15s;padding:.5rem}
+@media(min-width:600px){.modal-overlay{align-items:center;padding:1rem}}
+.modal{background:#fff;border-radius:var(--radius-lg) var(--radius-lg) 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.12);width:100%;max-width:540px;max-height:90vh;overflow-y:auto}
+@media(min-width:600px){.modal{border-radius:var(--radius-lg)}}
+.modal-head{padding:.8rem 1rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--warm-100);position:sticky;top:0;background:#fff;z-index:1}
+.modal-head h3{font-size:.82rem;font-weight:700}
+.modal-close{font-size:1.2rem;color:var(--warm-400);cursor:pointer;line-height:1;padding:0 .15rem}
+.modal-close:hover{color:var(--ink)}
+.modal-body{padding:1rem}
+.modal-foot{padding:.6rem 1rem;border-top:1px solid var(--warm-100);display:flex;justify-content:flex-end;gap:.4rem;position:sticky;bottom:0;background:#fff}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.slide-up{animation:slideUp .3s ease-out}
+
+/* MOBILE SPECIFIC */
+@media(max-width:480px){
+  html{font-size:14px}
+  .header{padding:0 .6rem;height:50px}
+  .header-title{font-size:.82rem}
+  .nav-btn{font-size:.62rem;padding:.3rem .4rem}
+  .container{padding:.6rem}
+  .card-body{padding:.75rem}
+  .report-actions{flex-direction:column;align-items:stretch}
+  .report-actions-left{justify-content:center}
+  .btn-lg{padding:.6rem 1.2rem;font-size:.78rem}
+  .kpi-strip{grid-template-columns:repeat(2,1fr)}
+  .kpi-cell{padding:.5rem .5rem .4rem}
+  .kpi-val{font-size:.9rem}
+  .rpt-title{font-size:18px}
+  .rpt-dual{flex-direction:column}
+  .report-page{padding:10mm 8mm}
+  .toast{bottom:1rem;font-size:.65rem;max-width:90vw}
+  .install-banner{padding:.6rem .8rem}
+}
+</style>
 </head>
 <body>
-<div id="addToHomeBar">可将本页添加到主屏幕，像App一样使用 <span class="close-pwa" onclick="this.parentElement.remove()">×</span></div>
 
-<div class="header">
+<!-- HEADER -->
+<div class="header no-print">
   <div class="header-brand">
     <div class="header-logo">致</div>
-    <div>
-      <h1>致城酒店投资测算</h1>
-      <div class="sub">商机管理 · 多人协同 · 智能决策</div>
-    </div>
+    <div class="header-title">致城酒店投资测算</div>
   </div>
-  <div class="header-right">
-    <button class="btn-nav active" data-page="clients">客资管理</button>
-    <button class="btn-nav" data-page="calc">投资测算</button>
-    <div class="user-tag" id="userTag">
-      <span class="dot"></span><span id="userNameDisplay">未登录</span>
+  <div class="header-nav">
+    <button class="nav-btn active" data-page="clients">客资</button>
+    <button class="nav-btn" data-page="calc">测算</button>
+    <button class="nav-btn" data-page="history">历史</button>
+    <button class="nav-btn" data-page="report">报告</button>
+    <div style="width:1px;height:14px;background:rgba(255,255,255,.12);margin:0 .15rem;flex-shrink:0"></div>
+    <div class="user-pill" id="userPill" onclick="openLoginModal()">
+      <span class="user-dot"></span>
+      <span id="userNameDisplay">未登录</span>
     </div>
   </div>
 </div>
 
+<!-- INSTALL BANNER -->
+<div class="install-banner" id="installBanner">
+  <div style="font-size:1.3rem;flex-shrink:0">📲</div>
+  <div class="install-banner-text">
+    安装到桌面，随时使用
+    <div class="install-banner-sub">添加后，像 App 一样一键打开</div>
+  </div>
+  <button class="btn-install" id="installBtn" style="flex-shrink:0">安装</button>
+  <button class="btn-install-x" onclick="dismissInstallBanner()">×</button>
+</div>
+
 <div class="container">
 
-<!-- ==================== 客资管理页 ==================== -->
+<!-- PAGE: 客资库 -->
 <div class="page active" id="page-clients">
   <div class="card">
     <div class="card-header">
-      <h3>客资列表</h3>
-      <div style="display:flex;gap:0.5rem;align-items:center">
-        <select id="filterStatus" style="padding:.35rem .5rem;font-size:.7rem;border:1px solid var(--warm-200);border-radius:var(--radius-sm)" onchange="loadClients()">
-          <option value="">全部状态</option>
-          <option value="待处理">待处理</option>
-          <option value="已认领">已认领</option>
-          <option value="已测算">已测算</option>
+      <h3>客资列表 <span id="clientCount" style="font-size:.6rem;color:var(--warm-400);font-weight:400;margin-left:.3rem"></span></h3>
+      <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap">
+        <select id="filterStatus" style="padding:.3rem .4rem;font-size:.65rem;border:1.5px solid var(--warm-200);border-radius:var(--radius-sm);background:#fff" onchange="renderClients()">
+          <option value="">全部状态</option><option value="待处理">待处理</option><option value="已认领">已认领</option><option value="已测算">已测算</option>
         </select>
-        <button class="btn btn-primary btn-sm" onclick="openClientModal()">+ 录入客资</button>
-        <button class="btn btn-ghost btn-sm" onclick="loadClients()">刷新</button>
+        <input id="searchClient" placeholder="搜索酒店名..." style="padding:.3rem .5rem;font-size:.65rem;border:1.5px solid var(--warm-200);border-radius:var(--radius-sm);width:100px" oninput="renderClients()">
+        <button class="btn btn-primary btn-sm" onclick="openClientModal()">+ 录入</button>
+        <button class="btn btn-outline-primary btn-sm" onclick="exportClients()" title="导出客资JSON">⬇ 导出</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('importFile').click()" title="导入客资JSON">⬆ 导入</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importClients(event)">
       </div>
     </div>
     <div class="table-wrap">
       <table>
-        <thead>
-          <tr>
-            <th>酒店名称</th><th>面积m²</th><th>客房</th><th>联系人</th><th>来源</th><th>录入人</th><th>认领人</th><th>状态</th><th>时间</th><th>操作</th>
-          </tr>
-        </thead>
-        <tbody id="clientTableBody">
-          <tr><td colspan="10" class="empty">加载中...</td></tr>
-        </tbody>
+        <thead><tr><th>酒店名称</th><th>面积</th><th>客房</th><th>联系人</th><th>来源</th><th>录入人</th><th>认领人</th><th>状态</th><th>时间</th><th>操作</th></tr></thead>
+        <tbody id="clientTbody"><tr><td colspan="10"><div class="empty"><div class="empty-icon">📋</div><p>暂无客资，点击「+ 录入」开始</p></div></td></tr></tbody>
       </table>
     </div>
   </div>
 </div>
 
-<!-- ==================== 测算页 ==================== -->
+<!-- PAGE: 测算 -->
 <div class="page" id="page-calc">
-  <div class="grid2">
-    <!-- 左侧输入 -->
+  <div class="g2">
     <div class="card">
-      <div class="card-header"><h3>参数录入</h3></div>
-      <div class="card-body" style="max-height:75vh;overflow-y:auto">
-        <!-- 选择一个客资 -->
-        <div class="form-group">
-          <label>关联客资 <span style="font-weight:400;text-transform:none;color:var(--warm-400)">(可选，选择后自动填充基础信息)</span></label>
-          <select id="linkClient" onchange="onLinkClient()">
-            <option value="">— 不关联 —</option>
-          </select>
+      <div class="card-header">
+        <h3>参数录入</h3>
+        <div style="display:flex;gap:.3rem">
+          <button class="btn btn-ghost btn-sm" onclick="resetForm()">重置</button>
+          <button class="btn btn-teal btn-sm" onclick="savePreset()">保存预设</button>
         </div>
-
-        <div style="background:var(--warm-50);padding:.75rem;border-radius:var(--radius-md);margin-bottom:.75rem">
-          <div style="font-size:.65rem;font-weight:700;letter-spacing:.06em;color:var(--gold-dim);margin-bottom:.5rem">基础信息</div>
-          <div class="form-row">
-            <div class="form-group"><label>酒店名称</label><input id="calcHotelName"></div>
-            <div class="form-group"><label>联系人</label><input id="calcContact"></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>联系电话</label><input id="calcPhone"></div>
-            <div class="form-group"><label>客房数量 <span class="input-unit">间</span></label><input type="number" id="calcRooms" value="48"></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>总面积 <span class="input-unit">m²</span></label><input type="number" id="calcArea" value="1800"></div>
-            <div class="form-group"><label>钻级</label><select id="calcLevel"><option>经济型</option><option>舒适型</option><option>中档型</option><option>高档型</option><option>豪华型</option></select></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>项目介入预算 <span class="input-unit">元</span></label><input type="number" id="calcInvest" value="730000"></div>
-            <div class="form-group"><label>转让预算 <span class="input-unit">元</span></label><input type="number" id="calcTransfer" value="500000"></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>房押预算</label><input type="number" id="calcDeposit" value="180000"></div>
-            <div class="form-group"><label>筹开预算</label><input type="number" id="calcStartup" value="50000"></div>
-          </div>
-          <div class="form-group"><label>翻新预算</label><input type="number" id="calcReno" value="0"></div>
+      </div>
+      <div class="card-body" style="max-height:calc(100vh - 120px);overflow-y:auto;padding-right:.6rem">
+        <div class="fg"><label>关联客资 <span class="unit">（选后自动填充）</span></label>
+          <select id="linkClient" onchange="onLinkClient()" style="width:100%"><option value="">— 不关联 —</option></select></div>
+        <div class="form-section">
+          <div class="form-section-label">基础信息</div>
+          <div class="fr2"><div class="fg"><label>酒店名称</label><input id="calcHotelName" placeholder="如：FUNX 设计师酒店"></div><div class="fg"><label>联系人</label><input id="calcContact"></div></div>
+          <div class="fr2"><div class="fg"><label>联系电话</label><input id="calcPhone"></div><div class="fg"><label>客房数量 <span class="unit">间</span></label><input type="number" id="calcRooms" value="48" min="1"></div></div>
+          <div class="fr2"><div class="fg"><label>总面积 <span class="unit">m²</span></label><input type="number" id="calcArea" value="1800" min="0"></div><div class="fg"><label>钻级</label><select id="calcLevel"><option>经济型</option><option>舒适型</option><option selected>中档型</option><option>高档型</option><option>豪华型</option></select></div></div>
         </div>
-
-        <div style="background:var(--warm-50);padding:.75rem;border-radius:var(--radius-md);margin-bottom:.75rem">
-          <div style="font-size:.65rem;font-weight:700;letter-spacing:.06em;color:var(--gold-dim);margin-bottom:.5rem">租金参数</div>
-          <div class="form-row">
-            <div class="form-group"><label>平方月租金 <span class="input-unit">元/m²</span></label><input type="number" id="calcSqmRent" value="25" step="0.5"></div>
-            <div class="form-group"><label>物业费 <span class="input-unit">元/m²/月</span></label><input type="number" id="calcPropFee" value="0" step="0.5"></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>扣点率 <span class="input-unit">%</span></label><input type="number" id="calcRentRatio" value="0" step="0.1"></div>
-            <div class="form-group"><label>扣点基数 <span class="input-unit">元</span></label><input type="number" id="calcRentBase" value="0"></div>
-          </div>
+        <div class="form-section">
+          <div class="form-section-label">投资预算</div>
+          <div class="fr2"><div class="fg"><label>项目介入预算 <span class="unit">元</span></label><input type="number" id="calcInvest" value="730000" min="0"></div><div class="fg"><label>转让预算 <span class="unit">元</span></label><input type="number" id="calcTransfer" value="500000" min="0"></div></div>
+          <div class="fr2"><div class="fg"><label>房押预算 <span class="unit">元</span></label><input type="number" id="calcDeposit" value="180000" min="0"></div><div class="fg"><label>筹开预算 <span class="unit">元</span></label><input type="number" id="calcStartup" value="50000" min="0"></div></div>
+          <div class="fg"><label>翻新预算 <span class="unit">元</span></label><input type="number" id="calcReno" value="0" min="0"></div>
         </div>
-
-        <div style="background:var(--warm-50);padding:.75rem;border-radius:var(--radius-md);margin-bottom:.75rem">
-          <div style="font-size:.65rem;font-weight:700;letter-spacing:.06em;color:var(--gold-dim);margin-bottom:.5rem">三季收入模型</div>
-
-          <div class="season-box peak">
-            <div class="season-title">旺季</div>
-            <div class="form-row-3">
-              <div class="form-group"><label>月份数</label><input type="number" id="calcPeakM" value="3"></div>
-              <div class="form-group"><label>ADR <span class="input-unit">元</span></label><input type="number" id="calcPeakADR" value="180"></div>
-              <div class="form-group"><label>OCC <span class="input-unit">%</span></label><input type="number" id="calcPeakOCC" value="90"></div>
-            </div>
-          </div>
-          <div class="season-box mid">
-            <div class="season-title">平季</div>
-            <div class="form-row-3">
-              <div class="form-group"><label>月份数</label><input type="number" id="calcMidM" value="6"></div>
-              <div class="form-group"><label>ADR</label><input type="number" id="calcMidADR" value="160"></div>
-              <div class="form-group"><label>OCC</label><input type="number" id="calcMidOCC" value="90"></div>
-            </div>
-          </div>
-          <div class="season-box low">
-            <div class="season-title">淡季</div>
-            <div class="form-row-3">
-              <div class="form-group"><label>月份数</label><input type="number" id="calcLowM" value="3"></div>
-              <div class="form-group"><label>ADR</label><input type="number" id="calcLowADR" value="120"></div>
-              <div class="form-group"><label>OCC</label><input type="number" id="calcLowOCC" value="80"></div>
-            </div>
-          </div>
-
-          <div class="form-group" style="margin-top:0.5rem">
-            <label>保守预测折扣率 <span class="input-unit">%</span></label>
-            <input type="number" id="calcDiscount" value="85">
-          </div>
+        <div class="form-section">
+          <div class="form-section-label">租金参数</div>
+          <div class="fr2"><div class="fg"><label>平方月租金 <span class="unit">元/m²</span></label><input type="number" id="calcSqmRent" value="25" step="0.5" min="0"></div><div class="fg"><label>物业费 <span class="unit">元/m²/月</span></label><input type="number" id="calcPropFee" value="0" step="0.5" min="0"></div></div>
+          <div class="fr2"><div class="fg"><label>扣点率 <span class="unit">%</span></label><input type="number" id="calcRentRatio" value="0" step="0.1" min="0"></div><div class="fg"><label>扣点基数 <span class="unit">元</span></label><input type="number" id="calcRentBase" value="0" min="0"></div></div>
         </div>
-
-        <div style="background:var(--warm-50);padding:.75rem;border-radius:var(--radius-md);margin-bottom:.75rem">
-          <div style="font-size:.65rem;font-weight:700;letter-spacing:.06em;color:var(--gold-dim);margin-bottom:.5rem">成本参数</div>
-          <div class="form-row">
-            <div class="form-group"><label>全年边际成本</label><input type="number" id="calcMarginal" value="240000"></div>
-            <div class="form-group"><label>员工数量</label><input type="number" id="calcStaff" value="8"></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>年人均工资</label><input type="number" id="calcSalary" value="60000"></div>
-            <div class="form-group"><label>公积金留存率 <span class="input-unit">%</span></label><input type="number" id="calcFund" value="5"></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>管理费率 <span class="input-unit">%</span></label><input type="number" id="calcMgmt" value="2" step="0.1"></div>
-            <div class="form-group"><label>分红比例 <span class="input-unit">%</span></label><input type="number" id="calcDiv" value="100"></div>
-          </div>
+        <div class="form-section">
+          <div class="form-section-label">三季收入模型</div>
+          <div class="season-box peak"><div class="season-title">旺季</div><div class="fr3"><div class="fg"><label>月份数</label><input type="number" id="calcPeakM" value="3" min="0" max="12"></div><div class="fg"><label>ADR <span class="unit">元</span></label><input type="number" id="calcPeakADR" value="180" min="0"></div><div class="fg"><label>OCC <span class="unit">%</span></label><input type="number" id="calcPeakOCC" value="90" min="0" max="100"></div></div></div>
+          <div class="season-box mid"><div class="season-title">平季</div><div class="fr3"><div class="fg"><label>月份数</label><input type="number" id="calcMidM" value="6" min="0" max="12"></div><div class="fg"><label>ADR</label><input type="number" id="calcMidADR" value="160" min="0"></div><div class="fg"><label>OCC</label><input type="number" id="calcMidOCC" value="90" min="0" max="100"></div></div></div>
+          <div class="season-box low"><div class="season-title">淡季</div><div class="fr3"><div class="fg"><label>月份数</label><input type="number" id="calcLowM" value="3" min="0" max="12"></div><div class="fg"><label>ADR</label><input type="number" id="calcLowADR" value="120" min="0"></div><div class="fg"><label>OCC</label><input type="number" id="calcLowOCC" value="80" min="0" max="100"></div></div></div>
+          <div class="fg" style="margin-top:.4rem"><label>保守预测折扣率 <span class="unit">%（稳健×此比例=保守）</span></label><input type="number" id="calcDiscount" value="85" min="50" max="100"></div>
         </div>
-
-        <button class="btn btn-primary btn-block btn-lg" onclick="runCalculate()">开始测算</button>
+        <div class="form-section">
+          <div class="form-section-label">成本参数</div>
+          <div class="fr2"><div class="fg"><label>全年边际成本 <span class="unit">元</span></label><input type="number" id="calcMarginal" value="240000" min="0"></div><div class="fg"><label>员工数量 <span class="unit">人</span></label><input type="number" id="calcStaff" value="8" min="0"></div></div>
+          <div class="fr2"><div class="fg"><label>年人均工资 <span class="unit">元</span></label><input type="number" id="calcSalary" value="60000" min="0"></div><div class="fg"><label>公积金留存率 <span class="unit">%</span></label><input type="number" id="calcFund" value="5" min="0" max="30"></div></div>
+          <div class="fr2"><div class="fg"><label>管理费率 <span class="unit">%</span></label><input type="number" id="calcMgmt" value="2" step="0.1" min="0"></div><div class="fg"><label>分红比例 <span class="unit">%</span></label><input type="number" id="calcDiv" value="100" min="0" max="100"></div></div>
+        </div>
+        <button class="btn btn-primary btn-block btn-lg" onclick="runCalc()" style="margin-top:.5rem">⚡ 开始测算</button>
       </div>
     </div>
-
-    <!-- 右侧结果 -->
-    <div id="calcResultPanel">
-      <div class="card">
-        <div class="empty">
-          <div class="icon">&#9744;</div>
-          <p style="font-weight:500;color:var(--warm-400)">填写左侧参数后点击「开始测算」</p>
-          <p style="font-size:.72rem;color:var(--warm-300)">系统将自动生成完整的投资测算报告</p>
-        </div>
-      </div>
+    <div id="calcResult">
+      <div class="card"><div class="empty"><div class="empty-icon">📊</div><p style="font-weight:600;color:var(--warm-400);font-size:.82rem">填写参数后点击「开始测算」</p><p style="font-size:.68rem;color:var(--warm-300);margin-top:.2rem">系统将自动生成完整报告与图表</p></div></div>
     </div>
   </div>
 </div>
 
+<!-- PAGE: 历史 -->
+<div class="page" id="page-history">
+  <div class="g2" style="align-items:start">
+    <div class="card"><div class="card-header"><h3>测算历史</h3><button class="btn btn-warn btn-sm" onclick="clearHistory()">清空</button></div><div class="card-body" id="historyList" style="padding:.4rem"><div class="empty"><div class="empty-icon">🕐</div><p>暂无测算历史</p></div></div>
+    <div id="histDetail"><div class="card"><div class="empty"><div class="empty-icon">👈</div><p style="color:var(--warm-400);font-size:.78rem">点击左侧记录查看详情</p></div></div>
+  </div>
 </div>
 
-<!-- ============== 录入客资弹窗 ============== -->
+<!-- PAGE: 报告 -->
+<div class="page" id="page-report">
+  <div id="reportContent">
+    <div class="card"><div class="empty"><div class="empty-icon">📑</div><p style="font-weight:600;color:var(--warm-400);font-size:.82rem">选择测算结果后点击「生成报告」</p><p style="font-size:.68rem;color:var(--warm-300);margin-top:.2rem">报告支持屏幕预览与 PDF 下载，效果完全一致</p></div></div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<!-- 客资弹窗 -->
 <div class="modal-overlay" id="clientModal" style="display:none">
   <div class="modal">
-    <div class="modal-header">
-      <h3 id="clientModalTitle">录入客资</h3>
-      <button class="modal-close" onclick="closeClientModal()">&#10005;</button>
-    </div>
+    <div class="modal-head"><h3 id="clientModalTitle">录入客资</h3><button class="modal-close" onclick="closeClientModal()">×</button></div>
     <div class="modal-body">
       <input type="hidden" id="editClientId">
-      <div class="form-row">
-        <div class="form-group"><label>酒店名称 *</label><input id="clientHotelName" placeholder="如：FUNX 设计师酒店"></div>
-        <div class="form-group"><label>联系人</label><input id="clientContact"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>联系电话</label><input id="clientPhone"></div>
-        <div class="form-group"><label>线索来源</label><select id="clientSource"><option>专业中介</option><option>集团商机</option><option>自主开发</option><option>朋友介绍</option><option>网络渠道</option><option>其他</option></select></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>面积 m²</label><input type="number" id="clientArea" value="0"></div>
-        <div class="form-group"><label>客房数量</label><input type="number" id="clientRooms" value="0"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>钻级</label><select id="clientLevel"><option>经济型</option><option>舒适型</option><option>中档型</option><option>高档型</option><option>豪华型</option></select></div>
-        <div class="form-group"><label>酒店类型</label><select id="clientType"><option>连锁型</option><option>单体酒店</option></select></div>
-      </div>
-      <div class="form-group"><label>地址</label><input id="clientAddr" placeholder="详细地址"></div>
-      <div class="form-group"><label>备注</label><textarea id="clientNotes" placeholder="商机备忘..."></textarea></div>
+      <div class="fr2"><div class="fg"><label>酒店名称 *</label><input id="clientHotelName"></div><div class="fg"><label>联系人</label><input id="clientContact"></div></div>
+      <div class="fr2"><div class="fg"><label>联系电话</label><input id="clientPhone"></div><div class="fg"><label>线索来源</label><select id="clientSource"><option>专业中介</option><option>集团商机</option><option>自主开发</option><option>朋友介绍</option><option>网络渠道</option><option>其他</option></select></div></div>
+      <div class="fr2"><div class="fg"><label>面积 m²</label><input type="number" id="clientArea" value="0" min="0"></div><div class="fg"><label>客房数量</label><input type="number" id="clientRooms" value="0" min="0"></div></div>
+      <div class="fr2"><div class="fg"><label>钻级</label><select id="clientLevel"><option>经济型</option><option>舒适型</option><option>中档型</option><option>高档型</option><option>豪华型</option></select></div><div class="fg"><label>酒店类型</label><select id="clientType"><option>连锁型</option><option>单体酒店</option></select></div></div>
+      <div class="fg"><label>地址</label><input id="clientAddr"></div>
+      <div class="fg"><label>备注</label><textarea id="clientNotes"></textarea></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeClientModal()">取消</button>
-      <button class="btn btn-primary" onclick="saveClient()">保存</button>
-    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeClientModal()">取消</button><button class="btn btn-primary" onclick="saveClient()">保存</button></div>
   </div>
 </div>
 
-<!-- ============== 登录弹窗 ============== -->
+<!-- 登录弹窗 -->
 <div class="modal-overlay" id="loginModal" style="display:none">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>请输入您的名字</h3>
-      <button class="modal-close" onclick="closeLoginModal()">&#10005;</button>
-    </div>
+  <div class="modal" style="max-width:380px">
+    <div class="modal-head"><h3>请输入您的名字</h3><button class="modal-close" onclick="closeLoginModal()">×</button></div>
     <div class="modal-body">
-      <p style="font-size:.78rem;color:var(--warm-500);margin-bottom:.75rem">用于多人协同时识别录入人和认领人</p>
-      <div class="form-group"><label>您的名字</label><input id="loginName" placeholder="如：FUNX"></div>
+      <p style="font-size:.72rem;color:var(--warm-500);margin-bottom:.6rem">用于记录录入人和认领人，客资数据保存在本设备</p>
+      <div class="fg"><label>您的名字</label><input id="loginName" placeholder="如：Shawn" onkeydown="if(event.key==='Enter')doLogin()"></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" onclick="doLogin()">确认</button>
+    <div class="modal-foot"><button class="btn btn-primary" onclick="doLogin()">确认</button></div>
+  </div>
+</div>
+
+<!-- 分享弹窗 -->
+<div class="modal-overlay" id="shareModal" style="display:none">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-head"><h3>分享工具包</h3><button class="modal-close" onclick="closeShareModal()">×</button></div>
+    <div class="modal-body">
+      <p style="font-size:.72rem;color:var(--warm-500);margin-bottom:.6rem">以下选项可将工具与您的客资数据一同分享给同事：</p>
+      <div class="fg"><label>分享说明（会附在数据包中）</label><textarea id="shareNote" placeholder="例如：这是目前的客资列表，你用浏览器打开就能直接用" style="min-height:48px"></textarea></div>
+      <div class="fg" style="margin-top:.6rem"><label>包含内容</label><div id="shareContentSummary" style="font-size:.72rem;color:var(--warm-500);background:var(--warm-50);padding:.45rem .6rem;border-radius:var(--radius-sm);margin-top:.15rem">✓ 客资 — 条 · ✓ 测算历史 — 条 · ✓ 参数预设 · ✓ 完整工具功能</div></div>
     </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeShareModal()">取消</button><button class="btn btn-gold" onclick="createShareBundle()">⬇ 下载分享包</button></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
+<!-- Chart.js loaded async with fallback -->
 <script>
-// ═══════════════ STATE ═══════════════
-let currentUser = { id: '', name: '' };
-const API = '';
+// ===== PWA INSTALL PROMPT =====
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const banner = document.getElementById('installBanner');
+  banner.classList.add('show');
+  document.getElementById('installBtn').addEventListener('click', () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => { deferredPrompt = null; banner.classList.remove('show'); });
+    }
+  });
+});
+function dismissInstallBanner() {
+  document.getElementById('installBanner').classList.remove('show');
+  localStorage.setItem('install_banner_dismissed', '1');
+}
 
-// ═══════════════ INIT ═══════════════
+// ===== CHART.JS LOAD (async, non-blocking) =====
+let Chart = null;
+let chartLoadAttempted = false;
+function loadChartJS(cb) {
+  if (Chart) { cb && cb(); return; }
+  if (chartLoadAttempted) return;
+  chartLoadAttempted = true;
+  const cdnUrl = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js';
+  const fallbackUrl = 'https://unpkg.com/chart.js@4.4.7/dist/chart.umd.min.js';
+  function tryLoad(url, isFallback) {
+    const s = document.createElement('script');
+    s.src = url;
+    s.async = true;
+    s.onload = () => { Chart = window.Chart; cb && cb(); };
+    s.onerror = () => {
+      if (!isFallback) { tryLoad(fallbackUrl, true); }
+      else { console.warn('Chart.js failed to load from all CDNs'); cb && cb(); }
+    };
+    document.head.appendChild(s);
+  }
+  tryLoad(cdnUrl, false);
+}
+// Load chart when user clicks calc tab (lazy load)
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.requestIdleCallback) requestIdleCallback(() => loadChartJS(), { timeout: 3000 });
+  else setTimeout(() => loadChartJS(), 2000);
+});
+
+// ===== STORAGE ENGINE =====
+const DB = {
+  prefix: 'zhicheng_v3_',
+  get(k) { try { return JSON.parse(localStorage.getItem(this.prefix + k) || 'null'); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(this.prefix + k, JSON.stringify(v)); } catch(e) { console.warn('DB.set error:', e); } },
+  del(k) { localStorage.removeItem(this.prefix + k); }
+};
+
+let currentUser = DB.get('user') || { id: '', name: '' };
+let clients = DB.get('clients') || [];
+let calcHistory = DB.get('calcHistory') || [];
+let chartInstances = {};
+
+// ===== INIT =====
 function init() {
-  // 检测是否通过 file:// 协议打开（而非服务器地址）
-  if (window.location.protocol === 'file:') {
-    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;text-align:center"><div><h2 style="color:#b8963e">请通过服务器地址访问</h2><p style="color:#666;margin:12px 0">不要直接双击 HTML 文件打开，请在浏览器中输入服务器地址。</p><p style="font-size:14px">请复制以下地址到浏览器：</p><p style="font-size:18px;font-weight:700;background:#f5f3f0;padding:8px 16px;border-radius:4px;display:inline-block;margin-top:8px">http://<span id="ipHint">192.168.0.102</span>:8088</p></div></div>';
-    return;
-  }
-
-  const saved = localStorage.getItem('zhicheng_user');
-  if (saved) {
-    currentUser = JSON.parse(saved);
-    document.getElementById('userNameDisplay').textContent = currentUser.name;
+  if (!currentUser || !currentUser.name) {
+    setTimeout(() => openLoginModal(), 400);
   } else {
-    setTimeout(() => document.getElementById('loginModal').style.display = 'flex', 400);
+    document.getElementById('userNameDisplay').textContent = currentUser.name;
   }
-
-  // Tab switching
-  document.querySelectorAll('.btn-nav').forEach(btn => {
+  document.querySelectorAll('.nav-btn[data-page]').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.nav-btn[data-page]').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById('page-' + btn.dataset.page).classList.add('active');
+      const target = document.getElementById('page-' + btn.dataset.page);
+      if (target) target.classList.add('active');
+      if (btn.dataset.page === 'history') renderHistory();
+      if (btn.dataset.page === 'clients') renderClients();
     });
   });
-
-  fetch(API + '/api/ping').catch(() => showToast('无法连接服务器，请确认已通过 http://192.168.0.102:8088 访问', true));
-  loadClients();
-  loadClientOptions();
-
-  // PWA: show "Add to Home Screen" prompt on iOS/Android
-  const bar = document.getElementById('addToHomeBar');
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
-  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-  if (bar && isMobile && !isStandalone && !localStorage.getItem('pwa_prompt_dismissed')) {
-    setTimeout(() => { bar.classList.add('show'); }, 2500);
-    bar.addEventListener('click', (e) => {
-      if (e.target.classList.contains('close-pwa')) return;
-      localStorage.setItem('pwa_prompt_dismissed', '1');
-      bar.remove();
-    });
-    bar.querySelector('.close-pwa').addEventListener('click', () => {
-      localStorage.setItem('pwa_prompt_dismissed', '1');
-      bar.remove();
-    });
-  }
+  renderClients();
+  refreshLinkOptions();
 }
 
-// ═══════════════ USER ═══════════════
+// ===== USER =====
+function openLoginModal() { document.getElementById('loginModal').style.display = 'flex'; setTimeout(() => { try { document.getElementById('loginName').focus(); } catch(e) {} }, 100); }
+function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; }
 function doLogin() {
   const name = document.getElementById('loginName').value.trim();
-  if (!name) return showToast('请输入名字', true);
-  fetch(API + '/api/users', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name })
-  }).then(r => r.json()).then(data => {
-    currentUser = { id: data.id, name: data.name };
-    localStorage.setItem('zhicheng_user', JSON.stringify(currentUser));
-    document.getElementById('userNameDisplay').textContent = currentUser.name;
-    closeLoginModal();
-    showToast('欢迎，' + currentUser.name);
-  });
+  if (!name) return toast('请输入名字', true);
+  currentUser = { id: 'u_' + Date.now().toString(36), name: name };
+  DB.set('user', currentUser);
+  document.getElementById('userNameDisplay').textContent = name;
+  closeLoginModal();
+  toast('欢迎，' + name);
 }
 
-function closeLoginModal() {
-  document.getElementById('loginModal').style.display = 'none';
+// ===== CLIENTS CRUD =====
+function renderClients() {
+  const filter = document.getElementById('filterStatus').value;
+  const search = document.getElementById('searchClient').value.trim().toLowerCase();
+  let list = clients.slice();
+  if (filter) list = list.filter(c => c.status === filter);
+  if (search) list = list.filter(c => (c.hotel_name || '').toLowerCase().includes(search) || (c.contact_name || '').toLowerCase().includes(search));
+  document.getElementById('clientCount').textContent = `\u5171 ${clients.length} \u6761`;
+  const tbody = document.getElementById('clientTbody');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="10"><div class="empty"><div class="empty-icon">\ud83d\udccb</div><p>\u6682\u65e0\u5ba2\u8d44</p></div></td></tr>'; return; }
+  tbody.innerHTML = list.map(c => {
+    const sc = c.status === '\u5df2\u6d4b\u7b97' ? 'badge-green' : c.status === '\u5df2\u8ba4\u9886' ? 'badge-blue' : 'badge-gray';
+    const canClaim = !c.claimed_by && c.created_by !== currentUser.id;
+    const cid = esc(c.id);
+    return '<tr>' +
+      '<td><strong>' + esc(c.hotel_name) + '</strong>' + (c.notes ? '<div style="font-size:.62rem;color:var(--warm-400);margin-top:1px">' + esc(c.notes.slice(0, 30)) + (c.notes.length > 30 ? '\u2026' : '') + '</div>' : '') + '</td>' +
+      '<td class="num">' + (c.area || 0) + '</td>' +
+      '<td class="num">' + (c.rooms || 0) + '</td>' +
+      '<td>' + esc(c.contact_name || '\u2014') + '</td>' +
+      '<td><span class="badge badge-gray">' + esc(c.source || '\u2014') + '</span></td>' +
+      '<td style="font-size:.68rem">' + esc(c.created_by_name || '\u2014') + '</td>' +
+      '<td style="font-size:.68rem">' + esc(c.claimed_by_name || '\u2014') + '</td>' +
+      '<td><span class="badge ' + sc + '">' + c.status + '</span></td>' +
+      '<td style="font-size:.62rem;color:var(--warm-400)">' + (c.created_at ? c.created_at.slice(0, 10) : '') + '</td>' +
+      '<td style="white-space:nowrap;display:flex;gap:.2rem;flex-wrap:wrap">' +
+      (canClaim ? '<button class="btn btn-gold btn-sm" onclick="claimClient(\'' + cid + '\')">\u8ba4\u9886</button>' : '') +
+      '<button class="btn btn-ghost btn-sm" onclick="goCalcWith(\'' + cid + '\')">\u6d4b\u7b97</button>' +
+      '<button class="btn btn-ghost btn-sm" onclick="editClient(\'' + cid + '\')">\u7f16\u8f91</button>' +
+      '<button class="btn btn-sm" style="color:var(--burgundy);border:1px solid var(--warm-200)" onclick="deleteClient(\'' + cid + '\')">\u5220</button>' +
+      '</td></tr>';
+  }).join('');
 }
 
-// ═══════════════ CLIENTS ═══════════════
-function loadClients() {
-  const status = document.getElementById('filterStatus').value;
-  const url = API + '/api/clients' + (status ? '?status=' + encodeURIComponent(status) : '');
-  fetch(url).then(r => { if (!r.ok) throw new Error('加载失败'); return r.json(); }).then(data => {
-    const tbody = document.getElementById('clientTableBody');
-    if (!data.length) {
-      tbody.innerHTML = '<tr><td colspan="10" class="empty">暂无客资，点击「+ 录入客资」开始</td></tr>';
-      return;
-    }
-    tbody.innerHTML = data.map(c => {
-      const statusBadge = c.status === '已测算' ? 'badge-green' : c.status === '已认领' ? 'badge-blue' : 'badge-gray';
-      return `<tr>
-        <td><strong>${esc(c.hotel_name)}</strong></td>
-        <td>${c.area}</td><td>${c.rooms}</td>
-        <td>${esc(c.contact_name)}</td><td>${esc(c.source)}</td>
-        <td>${esc(c.created_by_name)}</td>
-        <td>${esc(c.claimed_by_name) || '—'}</td>
-        <td><span class="badge ${statusBadge}">${c.status}</span></td>
-        <td style="font-size:.7rem;color:var(--warm-400)">${c.created_at}</td>
-        <td style="white-space:nowrap">
-          ${!c.claimed_by && c.created_by !== currentUser.id ? `<button class="btn btn-gold btn-sm" onclick="claimClient('${c.id}')">认领</button> ` : ''}
-          <button class="btn btn-ghost btn-sm" onclick="editClient('${c.id}')">编辑</button>
-          <button class="btn btn-ghost btn-sm" onclick="deleteClient('${c.id}')" style="color:var(--burgundy)">删</button>
-        </td>
-      </tr>`;
-    }).join('');
-  }).catch(e => { document.getElementById('clientTableBody').innerHTML = '<tr><td colspan="10" class="empty" style="color:var(--burgundy)">加载失败，请刷新页面或检查服务器状态</td></tr>'; });
+function openClientModal(resetId) {
+  if (resetId !== false) document.getElementById('editClientId').value = '';
+  document.getElementById('clientModalTitle').textContent = '\u5f55\u5f55\u5ba2\u8d44';
+  ['clientHotelName', 'clientContact', 'clientPhone', 'clientAddr', 'clientNotes'].forEach(id => { try { document.getElementById(id).value = ''; } catch(e) {} });
+  try { document.getElementById('clientArea').value = '0'; document.getElementById('clientRooms').value = '0'; } catch(e) {}
+  document.getElementById('clientModal').style.display = 'flex';
+  setTimeout(() => { try { document.getElementById('clientHotelName').focus(); } catch(e) {} }, 100);
 }
-
-function openClientModal() {
-  document.getElementById('editClientId').value = '';
-  document.getElementById('clientModalTitle').textContent = '录入客资';
-  ['clientHotelName','clientContact','clientPhone','clientAddr','clientNotes'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('clientArea').value = '0';
-  document.getElementById('clientRooms').value = '0';
+function editClient(cid) {
+  const c = clients.find(x => x.id === cid); if (!c) return;
+  document.getElementById('editClientId').value = cid;
+  document.getElementById('clientModalTitle').textContent = '\u7f16\u8f91\u5ba2\u8d44';
+  document.getElementById('clientHotelName').value = c.hotel_name || '';
+  document.getElementById('clientContact').value = c.contact_name || '';
+  document.getElementById('clientPhone').value = c.contact_phone || '';
+  document.getElementById('clientSource').value = c.source || '\u4e13\u4e1a\u4e2d\u4ecb';
+  document.getElementById('clientArea').value = c.area || 0;
+  document.getElementById('clientRooms').value = c.rooms || 0;
+  document.getElementById('clientLevel').value = c.hotel_level || '\u4e2d\u6863\u578b';
+  document.getElementById('clientType').value = c.hotel_type || '\u8fde\u9501\u578b';
+  document.getElementById('clientAddr').value = c.address || '';
+  document.getElementById('clientNotes').value = c.notes || '';
   document.getElementById('clientModal').style.display = 'flex';
 }
-
-function editClient(cid) {
-  fetch(API + '/api/clients').then(r => r.json()).then(data => {
-    const c = data.find(x => x.id === cid);
-    if (!c) return;
-    document.getElementById('editClientId').value = cid;
-    document.getElementById('clientModalTitle').textContent = '编辑客资';
-    document.getElementById('clientHotelName').value = c.hotel_name;
-    document.getElementById('clientContact').value = c.contact_name;
-    document.getElementById('clientPhone').value = c.contact_phone;
-    document.getElementById('clientSource').value = c.source;
-    document.getElementById('clientArea').value = c.area;
-    document.getElementById('clientRooms').value = c.rooms;
-    document.getElementById('clientLevel').value = c.hotel_level;
-    document.getElementById('clientType').value = c.hotel_type;
-    document.getElementById('clientAddr').value = c.address;
-    document.getElementById('clientNotes').value = c.notes;
-    document.getElementById('clientModal').style.display = 'flex';
-  });
-}
-
-function closeClientModal() {
-  document.getElementById('clientModal').style.display = 'none';
-}
+function closeClientModal() { document.getElementById('clientModal').style.display = 'none'; }
 
 function saveClient() {
   const hotelName = document.getElementById('clientHotelName').value.trim();
-  if (!hotelName) return showToast('酒店名称不能为空', true);
+  if (!hotelName) return toast('\u9152\u5e97\u540d\u79f0\u4e0d\u80fd\u4e3a\u7a7a', true);
   const cid = document.getElementById('editClientId').value;
   const payload = {
-    hotelName, contactName: document.getElementById('clientContact').value.trim(),
-    contactPhone: document.getElementById('clientPhone').value.trim(),
+    hotel_name: hotelName,
+    contact_name: (document.getElementById('clientContact').value || '').trim(),
+    contact_phone: (document.getElementById('clientPhone').value || '').trim(),
     source: document.getElementById('clientSource').value,
     area: parseFloat(document.getElementById('clientArea').value) || 0,
     rooms: parseInt(document.getElementById('clientRooms').value) || 0,
-    hotelLevel: document.getElementById('clientLevel').value,
-    hotelType: document.getElementById('clientType').value,
-    address: document.getElementById('clientAddr').value.trim(),
-    notes: document.getElementById('clientNotes').value.trim(),
-    userId: currentUser.id, userName: currentUser.name,
+    hotel_level: document.getElementById('clientLevel').value,
+    hotel_type: document.getElementById('clientType').value,
+    address: (document.getElementById('clientAddr').value || '').trim(),
+    notes: (document.getElementById('clientNotes').value || '').trim()
   };
-
-  const method = cid ? 'PUT' : 'POST';
-  const url = cid ? API + '/api/clients/' + cid : API + '/api/clients';
-
-  fetch(url, {
-    method, headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  }).then(r => {
-    if (!r.ok) return r.json().then(e => { throw new Error(e.detail || '保存失败') });
-    return r.json();
-  }).then(() => {
-    closeClientModal();
-    loadClients();
-    loadClientOptions();
-    showToast(cid ? '客资已更新' : '客资已录入');
-  }).catch(e => {
-    if (e.message.includes('Failed to fetch')) {
-      showToast('无法连接服务器，请确认已通过 http://192.168.0.102:8088 访问', true);
-    } else {
-      showToast(e.message, true);
-    }
-  });
+  if (cid) {
+    const idx = clients.findIndex(x => x.id === cid);
+    if (idx >= 0) { clients[idx] = { ...clients[idx], ...payload, updated_at: nowStr() }; toast('\u5ba2\u8d44\u5df2\u66f4\u65b0'); }
+  } else {
+    clients.unshift({
+      ...payload, id: 'c_' + Date.now().toString(36),
+      status: '\u5f85\u5904\u7406', created_by: currentUser.id, created_by_name: currentUser.name,
+      claimed_by: '', claimed_by_name: '', created_at: nowStr(), updated_at: nowStr()
+    });
+    toast('\u5ba2\u8d44\u5df2\u5f55\u5165');
+  }
+  DB.set('clients', clients);
+  closeClientModal();
+  renderClients();
+  refreshLinkOptions();
 }
 
-function deleteClient(cid) {
-  if (!confirm('确认删除该客资？')) return;
-  fetch(API + '/api/clients/' + cid, { method: 'DELETE' }).then(() => {
-    loadClients(); loadClientOptions(); showToast('客资已删除');
-  });
-}
-
+function deleteClient(cid) { if (!confirm('\u786e\u8ba4\u5220\u9664\u8be5\u5ba2\u8d44\uff1f')) return; clients = clients.filter(c => c.id !== cid); DB.set('clients', clients); renderClients(); refreshLinkOptions(); toast('\u5df2\u5220\u9664'); }
 function claimClient(cid) {
-  if (!currentUser.id) return showToast('请先登录', true);
-  fetch(API + '/api/clients/' + cid + '/claim', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ userId: currentUser.id, userName: currentUser.name })
-  }).then(r => {
-    if (!r.ok) return r.json().then(e => { throw new Error(e.detail) });
-    return r.json();
-  }).then(() => {
-    loadClients(); showToast('认领成功');
-  }).catch(e => showToast(e.message, true));
+  if (!currentUser.id) return toast('\u8bf7\u5148\u8bbe\u7f6e\u540d\u5b57', true);
+  const c = clients.find(x => x.id === cid); if (!c) return;
+  if (c.claimed_by && c.claimed_by !== currentUser.id) return toast('\u8be5\u5ba2\u8d44\u5df2\u88ab ' + c.claimed_by_name + ' \u8ba4\u9886', true);
+  c.claimed_by = currentUser.id; c.claimed_by_name = currentUser.name; c.status = '\u5df2\u8ba4\u9886';
+  DB.set('clients', clients); renderClients(); toast('\u8ba4\u9886\u6210\u529f');
 }
+function goCalcWith(cid) { document.querySelector('.nav-btn[data-page="calc"]').click(); document.getElementById('linkClient').value = cid; onLinkClient(); }
 
-function loadClientOptions() {
-  fetch(API + '/api/clients').then(r => r.json()).then(data => {
-    const sel = document.getElementById('linkClient');
-    sel.innerHTML = '<option value="">— 不关联 —</option>' +
-      data.map(c => `<option value="${c.id}">${esc(c.hotel_name)} (${c.rooms}间 · ${c.status})</option>`).join('');
-  });
+function refreshLinkOptions() {
+  const sel = document.getElementById('linkClient');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">\u2014 \u4e0d\u5173\u8054 \u2014</option>' + clients.map(c => '<option value="' + esc(c.id, true) + '">' + esc(c.hotel_name) + ' \u00b7 ' + c.rooms + '\u95f4 \u00b7 ' + c.status + '</option>').join('');
 }
-
 function onLinkClient() {
-  const cid = document.getElementById('linkClient').value;
-  if (!cid) return;
-  fetch(API + '/api/clients').then(r => r.json()).then(data => {
-    const c = data.find(x => x.id === cid);
-    if (!c) return;
-    document.getElementById('calcHotelName').value = c.hotel_name;
-    document.getElementById('calcContact').value = c.contact_name;
-    document.getElementById('calcPhone').value = c.contact_phone;
-    document.getElementById('calcRooms').value = c.rooms;
-    document.getElementById('calcArea').value = c.area;
-    document.getElementById('calcLevel').value = c.hotel_level;
-  });
+  const cid = document.getElementById('linkClient').value; if (!cid) return;
+  const c = clients.find(x => x.id === cid); if (!c) return;
+  document.getElementById('calcHotelName').value = c.hotel_name || '';
+  document.getElementById('calcContact').value = c.contact_name || '';
+  document.getElementById('calcPhone').value = c.contact_phone || '';
+  document.getElementById('calcRooms').value = c.rooms || 48;
+  document.getElementById('calcArea').value = c.area || 1800;
+  document.getElementById('calcLevel').value = c.hotel_level || '\u4e2d\u6863\u578b';
+  toast('\u5df2\u81ea\u52a8\u586b\u5145\u57fa\u7840\u4fe1\u606f');
 }
 
-// ═══════════════ CALCULATION ═══════════════
-function runCalculate() {
-  const params = {
-    hotelName: document.getElementById('calcHotelName').value || '未命名项目',
-    contactName: document.getElementById('calcContact').value,
-    contactPhone: document.getElementById('calcPhone').value,
+// ===== DATA EXPORT / IMPORT =====
+function exportClients() {
+  const data = { version: 'zhicheng_v3', exportedAt: nowStr(), exportedBy: currentUser.name, clients: clients, calcHistory: calcHistory, presets: DB.get('presets') || [] };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = '\u81f4\u57ce\u5ba2\u8d44_' + new Date().toISOString().slice(0, 10) + '.json'; a.click();
+  URL.revokeObjectURL(a.href);
+  toast('\u5ba2\u8d44\u5df2\u5bfc\u51fa\uff08\u542b ' + clients.length + ' \u6761\u5ba2\u8d44 + ' + calcHistory.length + ' \u6761\u6d4b\u7b97\u8bb0\u5f55\uff09');
+}
+function importClients(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!data.clients) { toast('\u6587\u4ef6\u683c\u5f0f\u4e0d\u6b63\u786e', true); return; }
+      const opt = confirm('\u68c0\u6d4b\u5230 ' + data.clients.length + ' \u6761\u5ba2\u8d44\u548c ' + (data.calcHistory || []).length + ' \u6761\u5386\u53f2\u8bb0\u5f55\u3002\n\u786e\u5b9a=\u66ff\u6362\u5f53\u524d\u6570\u636e\uff0c\u53d6\u6d88=\u5408\u5e76\u6570\u636e');
+      if (opt) { clients = data.clients; calcHistory = data.calcHistory || []; if (data.presets) DB.set('presets', data.presets); }
+      else { clients = [...(data.clients || []), ...clients]; calcHistory = [...(data.calcHistory || []), ...calcHistory]; }
+      DB.set('clients', clients); DB.set('calcHistory', calcHistory);
+      renderClients(); refreshLinkOptions(); renderHistory();
+      toast('\u5bfc\u5165\u5b8c\u6210\uff1a' + clients.length + ' \u6761\u5ba2\u8d44\uff0c' + calcHistory.length + ' \u6761\u5386\u53f2');
+    } catch (er) { toast('\u6587\u4ef6\u89e3\u6790\u5931\u8d25', true); console.error(er); }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ===== SHARE BUNDLE =====
+function openShareModal() {
+  document.getElementById('shareModal').style.display = 'flex';
+  document.getElementById('shareContentSummary').textContent = '\u2713 \u5ba2\u8d44 ' + clients.length + ' \u6761 \u00b7 \u2713 \u6d4b\u7b97\u5386\u53f2 ' + calcHistory.length + ' \u6761 \u00b7 \u2713 \u53c2\u6570\u9884\u8bbe \u00b7 \u2713 \u5b8c\u6574\u5de5\u5177\u529f\u80fd';
+}
+function closeShareModal() { document.getElementById('shareModal').style.display = 'none'; }
+function createShareBundle() {
+  const note = (document.getElementById('shareNote').value || '').trim();
+  const data = { version: 'zhicheng_v3_share', sharedAt: nowStr(), sharedBy: currentUser.name, note: note || '\u5206\u4eab\u7ed9\u4f60\u7684\u81f4\u57ce\u9152\u5e97\u6295\u8d44\u6d4b\u7b97\u5de5\u5177\u5305', clients: clients, calcHistory: calcHistory, presets: DB.get('presets') || [] };
+  const dataJSON = JSON.stringify(data);
+  // Use fetch to get current page HTML, inject data safely
+  fetch(location.href).then(r => r.text()).then(html => {
+    // Inject data as a JS variable in a separate script block
+    const scriptTag = '\n<script>\n// SHARED DATA INJECTION\nwindow.__SHARED_DATA__ = ' + dataJSON + ';\n<\/script>\n';
+    const injected = html.replace('___SHARED_DATA_PLACEHOLDER___', scriptTag);
+    const blob = new Blob([injected], { type: 'text/html' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = '\u81f4\u57ce\u9152\u5e97\u6295\u8d44\u6d4b\u7b97_' + (data.clients.length || 0) + '\u6761\u5ba2\u8d44.html'; a.click();
+    URL.revokeObjectURL(a.href);
+    closeShareModal();
+    toast('\u5206\u4eab\u5305\u5df2\u4e0b\u8f7d\uff0c\u53ef\u76f4\u63a5\u53d1\u7ed9\u540c\u4e8b');
+  }).catch(() => toast('\u751f\u6210\u5206\u4eab\u5305\u5931\u8d25\uff0c\u8bf7\u5c1d\u8bd5\u5bfc\u51faJSON\u65b9\u5f0f\u5206\u4eab', true));
+}
+
+// ===== CALCULATION ENGINE =====
+function calcEngine(p) {
+  const rc = p.roomCount, ta = p.totalArea;
+  if (rc <= 0) throw new Error('\u5ba2\u623f\u6570\u91cf\u5fc5\u987b\u5927\u4e8e0');
+  const yearFixed = ta * (p.sqmRent + p.propFee) * 12;
+  const yearFloat = p.rentBase > 0 ? p.rentBase * p.rentRatio / 100 : 0;
+  const yearRent = yearFixed + yearFloat, monthRent = yearRent / 12, dayRent = yearRent / 365, roomDayRent = yearRent / rc / 365;
+  const peakRev = p.peakM * 30 * rc * p.peakADR * p.peakOCC / 100;
+  const midRev = p.midM * 30 * rc * p.midADR * p.midOCC / 100;
+  const lowRev = p.lowM * 30 * rc * p.lowADR * p.lowOCC / 100;
+  const yearRevS = peakRev + midRev + lowRev, yearRevC = yearRevS * p.discount / 100;
+  const yearRPS = (p.peakADR * p.peakOCC / 100 * p.peakM + p.midADR * p.midOCC / 100 * p.midM + p.lowADR * p.lowOCC / 100 * p.lowM) / 12;
+  const yearRPC = yearRPS * p.discount / 100;
+  const yearADRS = (p.peakADR * p.peakM + p.midADR * p.midM + p.lowADR * p.lowM) / 12, yearADRC = yearADRS * p.discount / 100;
+  const yearOCC = (p.peakOCC * p.peakM + p.midOCC * p.midM + p.lowOCC * p.lowM) / 12;
+  const rnS = p.peakM * 30 * rc * p.peakOCC / 100 + p.midM * 30 * rc * p.midOCC / 100 + p.lowM * 30 * rc * p.lowOCC / 100, rnC = rnS * p.discount / 100;
+  const yearSalary = p.staffCount * p.salary;
+  const nightRent = rnS > 0 ? yearRent / rnS : 0, nightMarg = rnS > 0 ? p.marginal / rnS : 0, nightLabor = rnS > 0 ? yearSalary / rnS : 0, nightTotal = nightRent + nightMarg + nightLabor;
+  const costS = yearRent + p.marginal + yearSalary, costC = yearRent + p.marginal * p.discount / 100 + yearSalary * p.discount / 100;
+  const gopS = yearRevS - costS, gopC = yearRevC - costC;
+  const gopRS = yearRevS > 0 ? gopS / yearRevS * 100 : 0, gopRC = yearRevC > 0 ? gopC / yearRevC * 100 : 0;
+  const beRPS = nightTotal, beOCCS = yearADRS > 0 ? nightTotal / yearADRS * 100 : 0;
+  const beRPC = rnC > 0 ? costC / rnC : 0, beOCCC = yearADRC > 0 ? beRPC / yearADRC * 100 : 0;
+  const fundS = yearRevS * p.fund / 100, fundC = yearRevC * p.fund / 100;
+  const mgmtFS = yearRevS * p.mgmt / 100, mgmtFC = yearRevC * p.mgmt / 100;
+  const mgmtRS = gopS > 0 ? gopS * 0.05 : 0, mgmtRC = gopC > 0 ? gopC * 0.05 : 0;
+  const netS = (yearRevS - costS - mgmtFS - mgmtRS) * p.divRatio / 100, netC = (yearRevC - costC - mgmtFC - mgmtRC) * p.divRatio / 100;
+  const roiS = netS > 0 ? p.invest / netS : 999, roiC = netC > 0 ? p.invest / netC : 999;
+  let verdict, verdictColor;
+  if (roiS < 2.5 && gopRS > 30) { verdict = '\u5efa\u8bae\u6295\u8d44'; verdictColor = '#2d6a5e'; }
+  else if (roiS < 5 && gopRS > 15) { verdict = '\u8c28\u614e\u6295\u8d44'; verdictColor = '#b8963e'; }
+  else { verdict = '\u4e0d\u5efa\u8bae\u6295\u8d44'; verdictColor = '#7a2e3f'; }
+  return {
+    hotelName: p.hotelName, calcTime: nowStr(), verdict: verdict, verdictColor: verdictColor,
+    invest: p.invest, transfer: p.transfer, deposit: p.deposit, startup: p.startup, reno: p.reno,
+    yearFixed: yearFixed, yearFloat: yearFloat, yearRent: yearRent, monthRent: monthRent, dayRent: dayRent, roomDayRent: roomDayRent,
+    peakRev: peakRev, midRev: midRev, lowRev: lowRev,
+    yearRevS: yearRevS, yearRevC: yearRevC, yearRPS: yearRPS, yearRPC: yearRPC,
+    yearADRS: yearADRS, yearADRC: yearADRC, yearOCC: yearOCC, rnS: rnS, rnC: rnC,
+    nightRent: nightRent, nightMarg: nightMarg, nightLabor: nightLabor, nightTotal: nightTotal,
+    costS: costS, costC: costC, gopS: gopS, gopC: gopC, gopRS: gopRS, gopRC: gopRC,
+    beRPS: beRPS, beRPC: beRPC, beOCCS: beOCCS, beOCCC: beOCCC,
+    netS: netS, netC: netC, monthNetS: netS / 12, monthNetC: netC / 12,
+    roiS: roiS, roiC: roiC, yearSalary: yearSalary
+  };
+}
+
+function getParams() {
+  return {
+    hotelName: (document.getElementById('calcHotelName').value || '\u672a\u547d\u540d\u9879\u76ee'),
+    contact: (document.getElementById('calcContact').value || ''),
+    phone: (document.getElementById('calcPhone').value || ''),
     roomCount: parseFloat(document.getElementById('calcRooms').value) || 0,
     totalArea: parseFloat(document.getElementById('calcArea').value) || 0,
-    investBudget: parseFloat(document.getElementById('calcInvest').value) || 0,
-    transferBudget: parseFloat(document.getElementById('calcTransfer').value) || 0,
-    depositBudget: parseFloat(document.getElementById('calcDeposit').value) || 0,
-    startupBudget: parseFloat(document.getElementById('calcStartup').value) || 0,
-    renoBudget: parseFloat(document.getElementById('calcReno').value) || 0,
+    invest: parseFloat(document.getElementById('calcInvest').value) || 0,
+    transfer: parseFloat(document.getElementById('calcTransfer').value) || 0,
+    deposit: parseFloat(document.getElementById('calcDeposit').value) || 0,
+    startup: parseFloat(document.getElementById('calcStartup').value) || 0,
+    reno: parseFloat(document.getElementById('calcReno').value) || 0,
     sqmRent: parseFloat(document.getElementById('calcSqmRent').value) || 0,
-    propertyFee: parseFloat(document.getElementById('calcPropFee').value) || 0,
+    propFee: parseFloat(document.getElementById('calcPropFee').value) || 0,
     rentRatio: parseFloat(document.getElementById('calcRentRatio').value) || 0,
     rentBase: parseFloat(document.getElementById('calcRentBase').value) || 0,
-    peakMonths: parseFloat(document.getElementById('calcPeakM').value) || 0,
+    peakM: parseFloat(document.getElementById('calcPeakM').value) || 0,
     peakADR: parseFloat(document.getElementById('calcPeakADR').value) || 0,
     peakOCC: parseFloat(document.getElementById('calcPeakOCC').value) || 0,
-    midMonths: parseFloat(document.getElementById('calcMidM').value) || 0,
+    midM: parseFloat(document.getElementById('calcMidM').value) || 0,
     midADR: parseFloat(document.getElementById('calcMidADR').value) || 0,
     midOCC: parseFloat(document.getElementById('calcMidOCC').value) || 0,
-    lowMonths: parseFloat(document.getElementById('calcLowM').value) || 0,
+    lowM: parseFloat(document.getElementById('calcLowM').value) || 0,
     lowADR: parseFloat(document.getElementById('calcLowADR').value) || 0,
     lowOCC: parseFloat(document.getElementById('calcLowOCC').value) || 0,
-    discountRate: parseFloat(document.getElementById('calcDiscount').value) || 85,
-    yearlyMarginalCost: parseFloat(document.getElementById('calcMarginal').value) || 0,
+    discount: parseFloat(document.getElementById('calcDiscount').value) || 85,
+    marginal: parseFloat(document.getElementById('calcMarginal').value) || 0,
     staffCount: parseFloat(document.getElementById('calcStaff').value) || 0,
-    salaryPerStaff: parseFloat(document.getElementById('calcSalary').value) || 0,
-    fundRetention: parseFloat(document.getElementById('calcFund').value) || 5,
-    mgmtFeeRate: parseFloat(document.getElementById('calcMgmt').value) || 2,
-    dividendRatio: parseFloat(document.getElementById('calcDiv').value) || 100,
+    salary: parseFloat(document.getElementById('calcSalary').value) || 0,
+    fund: parseFloat(document.getElementById('calcFund').value) || 5,
+    mgmt: parseFloat(document.getElementById('calcMgmt').value) || 2,
+    divRatio: parseFloat(document.getElementById('calcDiv').value) || 100
   };
-
-  const totalM = params.peakMonths + params.midMonths + params.lowMonths;
-  if (totalM !== 12) return showToast('旺季+平季+淡季月份数之和必须等于12', true);
-  if (params.roomCount <= 0) return showToast('客房数量必须大于0', true);
-
-  const clientId = document.getElementById('linkClient').value;
-
-  fetch(API + '/api/calculate', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      params, clientId,
-      userId: currentUser.id, userName: currentUser.name,
-    })
-  }).then(r => {
-    if (!r.ok) return r.json().then(e => { throw new Error(e.detail) });
-    return r.json();
-  }).then(r => {
-    renderResult(r);
-    loadClients();
-    loadClientOptions();
-    showToast('测算完成');
-  }).catch(e => {
-    if (e.message.includes('Failed to fetch')) {
-      showToast('无法连接服务器，请确认已通过 http://192.168.0.102:8088 访问', true);
-    } else {
-      showToast(e.message, true);
-    }
-  });
 }
 
-function renderResult(r) {
-  const fmt = (v, d = 2) => Number(v).toLocaleString('zh-CN', { minimumFractionDigits: d, maximumFractionDigits: d });
-  const F = v => '¥' + fmt(v);
+function runCalc() {
+  const p = getParams();
+  if ((p.peakM + p.midM + p.lowM) !== 12) return toast('\u65fa\u5b63+\u5e73\u5b63+\u6de1\u5b63\u6708\u4efd\u548c\u5fc5\u987b=12', true);
+  if (p.roomCount <= 0) return toast('\u5ba2\u623f\u6570\u91cf\u5fc5\u987b>0', true);
+  let r; try { r = calcEngine(p); } catch (e) { return toast(e.message, true); }
+  const cid = document.getElementById('linkClient').value;
+  if (cid) { const c = clients.find(x => x.id === cid); if (c) { c.status = '\u5df2\u6d4b\u7b97'; c.updated_at = nowStr(); DB.set('clients', clients); } }
+  const histItem = { id: 'h_' + Date.now().toString(36), params: p, result: r, createdBy: currentUser.name, createdAt: nowStr() };
+  calcHistory.unshift(histItem); if (calcHistory.length > 50) calcHistory = calcHistory.slice(0, 50);
+  DB.set('calcHistory', calcHistory);
+  renderCalcResult(r, histItem.id);
+  renderClients();
+  toast('\u6d4b\u7b97\u5b8c\u6210');
+}
+
+// ===== CALC RESULT (quick view) =====
+function renderCalcResult(r, histId) {
+  const F = v => '\u00a5' + Number(v).toLocaleString('zh-CN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  const F2 = v => '\u00a5' + Number(v).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const P = v => Number(v).toFixed(1) + '%';
+  const N = v => Number(v).toLocaleString('zh-CN');
+  const roi_cs = r.roiS < 2.5 ? 'var(--teal)' : r.roiS < 5 ? 'var(--gold-dim)' : 'var(--burgundy)';
+  const roi_cc = r.roiC < 2.5 ? 'var(--teal)' : r.roiC < 5 ? 'var(--gold-dim)' : 'var(--burgundy)';
+  const dp = document.getElementById('calcDiscount').value;
 
-  const html = `
-    <div class="card">
-      <div class="card-header">
-        <h3>${esc(r.hotelName)} — 测算结果</h3>
-        <button class="btn btn-gold btn-sm" onclick="exportPDF('${r.calcId}')">下载 PDF</button>
-        <button class="btn btn-outline btn-sm" onclick="printReport('${r.calcId}')">打印</button>
-      </div>
-      <div class="card-body">
-        <div class="verdict-banner" style="background:${r.verdictColor}15">
-          <span class="verdict-text" style="background:${r.verdictColor}">${r.verdict}</span>
-          <div style="font-size:.7rem;color:var(--warm-500);margin-top:.4rem">测算时间：${r.calcTime}</div>
-        </div>
+  document.getElementById('calcResult').innerHTML =
+    '<div class="slide-up"><div class="card">' +
+      '<div class="card-header"><h3>' + esc(r.hotelName) + ' \u2014 \u6d4b\u7b97\u62a5\u544a</h3>' +
+        '<div style="display:flex;gap:.4rem;flex-wrap:wrap">' +
+          '<button class="btn btn-gold btn-sm" onclick="viewReport(\'' + esc(histId, true) + '\')">\ud83d\udcd1 \u5b8c\u6574\u62a5\u544a</button>' +
+          '<button class="btn btn-teal btn-sm" onclick="downloadPDF()">\ud83d\udcbe \u4e0b\u8f7d PDF</button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="copyResult(\'' + esc(histId, true) + '\')">\ud83d\udccb \u590d\u5236\u6458\u8981</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card-body">' +
+        '<div class="verdict-wrap"><div class="verdict-badge" style="background:' + r.verdictColor + '">' + r.verdict + '</div>' +
+          '<div class="verdict-meta">\u6d4b\u7b97\u65f6\u95f4\uff1a' + r.calcTime + ' \u00b7 \u6d4b\u7b97\u4eba\uff1a' + esc(currentUser.name) + '</div>' +
+        '</div>' +
+        '<div class="kpi-strip">' +
+          '<div class="kpi-cell"><div class="kpi-lbl">\u9879\u76ee\u4ecb\u5165\u9884\u7b97</div><div class="kpi-val">' + F(r.invest) + '</div></div>' +
+          '<div class="kpi-cell"><div class="kpi-lbl">\u5e74\u5316\u56de\u62a5(\u7a33\u5065)</div><div class="kpi-val" style="color:' + roi_cs + '">' + (r.roiS === 999 ? '\u221e' : r.roiS.toFixed(1)) + ' \u5e74</div></div>' +
+          '<div class="kpi-cell"><div class="kpi-lbl">\u5e74\u5316\u56de\u62a5(\u4fdd\u5b88)</div><div class="kpi-val" style="color:' + roi_cc + '">' + (r.roiC === 999 ? '\u221e' : r.roiC.toFixed(1)) + ' \u5e74</div></div>' +
+          '<div class="kpi-cell"><div class="kpi-lbl">\u6708\u7eaf\u5229(\u7a33\u5065)</div><div class="kpi-val">' + F(r.monthNetS) + '</div></div>' +
+          '<div class="kpi-cell"><div class="kpi-lbl">\u6708\u7eaf\u5229(\u4fdd\u5b88)</div><div class="kpi-val">' + F(r.monthNetC) + '</div></div>' +
+          '<div class="kpi-cell"><div class="kpi-lbl">\u5355\u623f\u65e5\u79df\u91d1</div><div class="kpi-val">' + F2(r.roomDayRent) + '</div></div>' +
+        '</div>' +
+        '<div class="tab-bar" style="margin-bottom:1rem">' +
+          '<button class="tab-btn active" onclick="switchCalcTab(this,\\'overview\\')">\u6536\u652f\u6982\u89c8</button>' +
+          '<button class="tab-btn" onclick="switchCalcTab(this,\\'charts\\')">\u56fe\u8868\u5206\u6790</button>' +
+          '<button class="tab-btn" onclick="switchCalcTab(this,\\'rent\\')">\u79df\u91d1\u8be6\u60c5</button>' +
+          '<button class="tab-btn" onclick="switchCalcTab(this,\\'cost\\')">\u6210\u672c\u76c8\u4e8f</button>' +
+        '</div>' +
 
-        <div class="kpi-grid">
-          <div class="kpi-item"><div class="kpi-label">项目介入预算</div><div class="kpi-value">${F(r.investBudget)}</div></div>
-          <div class="kpi-item"><div class="kpi-label">年化回报(稳健)</div><div class="kpi-value">${r.roiYears.stable} 年</div></div>
-          <div class="kpi-item"><div class="kpi-label">年化回报(保守)</div><div class="kpi-value">${r.roiYears.conservative} 年</div></div>
-          <div class="kpi-item"><div class="kpi-label">月纯利(稳健)</div><div class="kpi-value">${F(r.monthNetProfit.stable)}</div></div>
-          <div class="kpi-item"><div class="kpi-label">月纯利(保守)</div><div class="kpi-value">${F(r.monthNetProfit.conservative)}</div></div>
-          <div class="kpi-item"><div class="kpi-label">单房日租金</div><div class="kpi-value">${F(r.roomDayRent)}</div></div>
-        </div>
+        '<div class="tab-panel active" id="calc-tab-overview">' +
+          '<h4 style="font-size:.72rem;color:var(--navy);margin-bottom:.5rem;font-weight:700">\u4e09\u5b63\u6536\u5165\u62c6\u5206</h4>' +
+          '<div class="table-wrap" style="margin-bottom:1rem"><table>' +
+            '<tr><th></th><th>\u6708\u4efd\u6570</th><th>ADR</th><th>OCC</th><th>RevPar</th><th>\u5b63\u6536\u5165</th></tr>' +
+            '<tr><td style="color:var(--teal);font-weight:600">\u65fa\u5b63</td><td class="ctr">' + document.getElementById('calcPeakM').value + '</td><td class="num">' + F2(parseFloat(document.getElementById('calcPeakADR').value)) + '</td><td class="num">' + P(parseFloat(document.getElementById('calcPeakOCC').value)) + '</td><td class="num">' + F2(parseFloat(document.getElementById('calcPeakADR').value) * parseFloat(document.getElementById('calcPeakOCC').value) / 100) + '</td><td class="num" style="font-weight:600">' + F(r.peakRev) + '</td></tr>' +
+            '<tr><td style="color:var(--gold-dim);font-weight:600">\u5e73\u5b63</td><td class="ctr">' + document.getElementById('calcMidM').value + '</td><td class="num">' + F2(parseFloat(document.getElementById('calcMidADR').value)) + '</td><td class="num">' + P(parseFloat(document.getElementById('calcMidOCC').value)) + '</td><td class="num">' + F2(parseFloat(document.getElementById('calcMidADR').value) * parseFloat(document.getElementById('calcMidOCC').value) / 100) + '</td><td class="num" style="font-weight:600">' + F(r.midRev) + '</td></tr>' +
+            '<tr><td style="color:var(--burgundy);font-weight:600">\u6de1\u5b63</td><td class="ctr">' + document.getElementById('calcLowM').value + '</td><td class="num">' + F2(parseFloat(document.getElementById('calcLowADR').value)) + '</td><td class="num">' + P(parseFloat(document.getElementById('calcLowOCC').value)) + '</td><td class="num">' + F2(parseFloat(document.getElementById('calcLowADR').value) * parseFloat(document.getElementById('calcLowOCC').value) / 100) + '</td><td class="num" style="font-weight:600">' + F(r.lowRev) + '</td></tr>' +
+            '<tr style="background:var(--warm-50);font-weight:700"><td>\u5168\u5e74\u5408\u8ba1</td><td class="ctr">12</td><td class="num">' + F2(r.yearADRS) + '</td><td class="num">' + P(r.yearOCC) + '</td><td class="num">' + F2(r.yearRPS) + '</td><td class="num">' + F(r.yearRevS) + '</td></tr>' +
+          '</table></div>' +
+          '<h4 style="font-size:.72rem;color:var(--navy);margin-bottom:.5rem;font-weight:700">\u7a33\u5065 vs \u4fdd\u5b88\u5bf9\u6bd4</h4>' +
+          '<div class="dual"><div class="dual-col stable"><h4>\u7a33\u5065\u6d4b\u7b97</h4>' +
+            drow('\u5168\u5e74\u6536\u5165', F(r.yearRevS)) + drow('RevPar', F2(r.yearRPS)) + drow('ADR / OCC', F2(r.yearADRS) + ' / ' + P(r.yearOCC)) + drow('\u95f4\u591c\u6570', N(r.rnS)) +
+            drow('GOP\u6bdb\u5229', F(r.gopS), r.gopS >= 0 ? 'var(--teal)' : 'var(--burgundy)') + drow('GOP\u7387', P(r.gopRS)) +
+            drow('\u5e74\u5316\u56de\u62a5', (r.roiS === 999 ? '\u221e' : r.roiS.toFixed(1)) + ' \u5e74', roi_cs) + drow('\u6708\u7eaf\u5229', F(r.monthNetS)) +
+            drow('\u76c8\u4e8f\u5e73\u8861OCC', P(r.beOCCS)) +
+          '</div><div class="dual-col cons"><h4>\u4fdd\u5b88\u6d4b\u7b97\uff08' + dp + '%\uff09</h4>' +
+            drow('\u5168\u5e74\u6536\u5165', F(r.yearRevC)) + drow('RevPar', F2(r.yearRPC)) + drow('ADR', F2(r.yearADRC)) + drow('\u95f4\u591c\u6570', N(r.rnC)) +
+            drow('GOP\u6bdb\u5229', F(r.gopC), r.gopC >= 0 ? 'var(--teal)' : 'var(--burgundy)') + drow('GOP\u7387', P(r.gopRC)) +
+            drow('\u5e74\u5316\u56de\u62a5', (r.roiC === 999 ? '\u221e' : r.roiC.toFixed(1)) + ' \u5e74', roi_cc) + drow('\u6708\u7eaf\u5229', F(r.monthNetC)) +
+            drow('\u76c8\u4e8f\u5e73\u8861OCC', P(r.beOCCC)) +
+          '</div></div>' +
+        '</div>' +
 
-        <h4 style="font-size:.8rem;margin:1rem 0 .5rem;color:var(--navy)">三季收入模型</h4>
-        <table>
-          <tr><th></th><th>月份</th><th>ADR</th><th>OCC</th><th>RevPar</th><th>季度收入</th></tr>
-          <tr><td style="color:var(--teal);font-weight:600">旺季</td><td>${r.peakRevenue > 0 ? '3' : '—'}</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">${F(r.peakRevenue)}</td></tr>
-          <tr><td style="color:var(--gold-dim);font-weight:600">平季</td><td>6</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">${F(r.midRevenue)}</td></tr>
-          <tr><td style="color:var(--burgundy);font-weight:600">淡季</td><td>3</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">${F(r.lowRevenue)}</td></tr>
-          <tr style="font-weight:600;background:#fdf8ed"><td>全年</td><td>12</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">${F(r.yearRevenue.stable)}</td></tr>
-        </table>
+        '<div class="tab-panel" id="calc-tab-charts">' +
+          '<div style="text-align:center;padding:2rem;color:var(--warm-400)">\u8bf7\u70b9\u51fb\u300c\u5f00\u59cb\u6d4b\u7b97\u300d\u540e\u67e5\u770b\u56fe\u8868\uff0c\u6216\u70b9\u51fb\u4e0a\u65b9\u300c\u56fe\u8868\u5206\u6790\u300d\u6807\u7b7e</div>' +
+        '</div>' +
 
-        <h4 style="font-size:.8rem;margin:1rem 0 .5rem;color:var(--navy)">稳健 vs 保守对比</h4>
-        <div class="dual">
-          <div class="dual-col stable">
-            <h4>稳健测算</h4>
-            <div class="dual-row"><span class="lbl">全年收入</span><span class="val">${F(r.yearRevenue.stable)}</span></div>
-            <div class="dual-row"><span class="lbl">RevPar</span><span class="val">${F(r.yearRevPar.stable)}</span></div>
-            <div class="dual-row"><span class="lbl">ADR</span><span class="val">${F(r.yearADR.stable)}</span></div>
-            <div class="dual-row"><span class="lbl">OCC</span><span class="val">${P(r.yearOCC)}</span></div>
-            <div class="dual-row"><span class="lbl">间夜数</span><span class="val">${fmt(r.yearRoomNights.stable,0)}</span></div>
-            <div class="dual-row"><span class="lbl">GOP 毛利</span><span class="val" style="color:${r.gopGross.stable >= 0 ? 'var(--teal)' : 'var(--burgundy)'}">${F(r.gopGross.stable)}</span></div>
-            <div class="dual-row"><span class="lbl">GOP 率</span><span class="val">${P(r.gopRate.stable)}</span></div>
-            <div class="dual-row"><span class="lbl">年化回报</span><span class="val" style="color:${r.roiYears.stable < 2.5 ? 'var(--teal)' : r.roiYears.stable < 5 ? 'var(--gold-dim)' : 'var(--burgundy)'}">${r.roiYears.stable} 年</span></div>
-            <div class="dual-row"><span class="lbl">经营方月纯利</span><span class="val">${F(r.monthNetProfit.stable)}</span></div>
-            <div class="dual-row"><span class="lbl">盈亏平衡 RevPar</span><span class="val">${F(r.beRevPar.stable)}</span></div>
-            <div class="dual-row"><span class="lbl">盈亏平衡出租率</span><span class="val">${P(r.beOCC.stable)}</span></div>
-          </div>
-          <div class="dual-col cons">
-            <h4>保守测算</h4>
-            <div class="dual-row"><span class="lbl">全年收入</span><span class="val">${F(r.yearRevenue.conservative)}</span></div>
-            <div class="dual-row"><span class="lbl">RevPar</span><span class="val">${F(r.yearRevPar.conservative)}</span></div>
-            <div class="dual-row"><span class="lbl">ADR</span><span class="val">${F(r.yearADR.conservative)}</span></div>
-            <div class="dual-row"><span class="lbl">间夜数</span><span class="val">${fmt(r.yearRoomNights.conservative,0)}</span></div>
-            <div class="dual-row"><span class="lbl">GOP 毛利</span><span class="val" style="color:${r.gopGross.conservative >= 0 ? 'var(--teal)' : 'var(--burgundy)'}">${F(r.gopGross.conservative)}</span></div>
-            <div class="dual-row"><span class="lbl">GOP 率</span><span class="val">${P(r.gopRate.conservative)}</span></div>
-            <div class="dual-row"><span class="lbl">年化回报</span><span class="val" style="color:${r.roiYears.conservative < 2.5 ? 'var(--teal)' : r.roiYears.conservative < 5 ? 'var(--gold-dim)' : 'var(--burgundy)'}">${r.roiYears.conservative} 年</span></div>
-            <div class="dual-row"><span class="lbl">经营方月纯利</span><span class="val">${F(r.monthNetProfit.conservative)}</span></div>
-            <div class="dual-row"><span class="lbl">盈亏平衡 RevPar</span><span class="val">${F(r.beRevPar.conservative)}</span></div>
-            <div class="dual-row"><span class="lbl">盈亏平衡出租率</span><span class="val">${P(r.beOCC.conservative)}</span></div>
-          </div>
-        </div>
+        '<div class="tab-panel" id="calc-tab-rent">' +
+          '<div class="table-wrap"><table><tr><th>\u9879\u76ee</th><th class="num">\u91d1\u989d</th></tr>' +
+            '<tr><td>\u5e74\u56fa\u5b9a\u79df\u91d1</td><td class="num">' + F2(r.yearFixed) + '</td></tr>' +
+            '<tr><td>\u5e74\u6d6e\u52a8\u79df\u91d1</td><td class="num">' + F2(r.yearFloat) + '</td></tr>' +
+            '<tr style="font-weight:700;background:var(--warm-50)"><td>\u5e74\u603b\u79df\u91d1</td><td class="num">' + F2(r.yearRent) + '</td></tr>' +
+            '<tr><td>\u6708\u5747\u79df\u91d1</td><td class="num">' + F2(r.monthRent) + '</td></tr>' +
+            '<tr><td>\u65e5\u5747\u79df\u91d1</td><td class="num">' + F2(r.dayRent) + '</td></tr>' +
+            '<tr><td>\u5355\u623f\u65e5\u79df\u91d1</td><td class="num">' + F2(r.roomDayRent) + '</td></tr>' +
+          '</table></div>' +
+          '<div style="margin-top:.6rem;padding:.6rem;background:var(--gold-bg);border-radius:var(--radius-sm);border-left:3px solid var(--gold)">' +
+            '<p style="font-size:.7rem;color:var(--gold-dim);font-weight:600">\u8bf4\u660e</p>' +
+            '<p style="font-size:.68rem;color:var(--warm-600);margin-top:.15rem">\u5355\u623f\u65e5\u79df\u91d1\u662f\u6700\u6838\u5fc3\u7684\u6210\u672c\u6307\u6807\u3002\u82e5 ADR \u00d7 OCC < \u5355\u623f\u65e5\u79df\u91d1\uff0c\u7ecf\u8425\u5c06\u4e8f\u635f\u3002</p>' +
+          '</div>' +
+        '</div>' +
 
-        <h4 style="font-size:.8rem;margin:1rem 0 .5rem;color:var(--navy)">间夜成本拆分</h4>
-        <table>
-          <tr><th>租金成本</th><th>边际成本</th><th>人工成本</th><th>间夜总成本</th></tr>
-          <tr><td class="num">${F(r.nightRentCost)}</td><td class="num">${F(r.nightMarginalCost)}</td><td class="num">${F(r.nightLaborCost)}</td><td class="num" style="font-weight:600">${F(r.nightTotalCost)}</td></tr>
-        </table>
+        '<div class="tab-panel" id="calc-tab-cost">' +
+          '<h4 style="font-size:.72rem;color:var(--navy);margin-bottom:.5rem;font-weight:700">\u95f4\u591c\u6210\u672c\u62c6\u5206</h4>' +
+          '<div class="table-wrap" style="margin-bottom:1rem"><table><tr><th>\u79df\u91d1\u6210\u672c/\u95f4\u591c</th><th>\u8fb9\u9645\u6210\u672c/\u95f4\u591c</th><th>\u4eba\u5de5\u6210\u672c/\u95f4\u591c</th><th class="num">\u95f4\u591c\u603b\u6210\u672c</th></tr>' +
+            '<tr><td class="num">' + F2(r.nightRent) + '</td><td class="num">' + F2(r.nightMarg) + '</td><td class="num">' + F2(r.nightLabor) + '</td><td class="num" style="font-weight:700">' + F2(r.nightTotal) + '</td></tr>' +
+          '</table></div>' +
+          '<h4 style="font-size:.72rem;color:var(--navy);margin-bottom:.5rem;font-weight:700">\u5168\u5e74\u6210\u672c\u6c47\u603b</h4>' +
+          '<div class="table-wrap" style="margin-bottom:1rem"><table><tr><th>\u6210\u672c\u9879\u76ee</th><th class="num">\u7a33\u5065</th><th class="num">\u4fdd\u5b88</th></tr>' +
+            '<tr><td>\u5e74\u603b\u79df\u91d1</td><td class="num">' + F2(r.yearRent) + '</td><td class="num">' + F2(r.yearRent) + '</td></tr>' +
+            '<tr><td>\u5e74\u8fb9\u9645\u6210\u672c</td><td class="num">' + F2(parseFloat(document.getElementById('calcMarginal').value)) + '</td><td class="num">' + F2(parseFloat(document.getElementById('calcMarginal').value) * parseFloat(document.getElementById('calcDiscount').value) / 100) + '</td></tr>' +
+            '<tr><td>\u5e74\u4eba\u5de5\u6210\u672c</td><td class="num">' + F2(r.yearSalary) + '</td><td class="num">' + F2(r.yearSalary * parseFloat(document.getElementById('calcDiscount').value) / 100) + '</td></tr>' +
+            '<tr style="font-weight:700;background:var(--warm-50)"><td>\u5e74\u603b\u6210\u672c</td><td class="num">' + F2(r.costS) + '</td><td class="num">' + F2(r.costC) + '</td></tr>' +
+            '<tr><td>GOP\u6bdb\u5229</td><td class="num" style="color:' + (r.gopS >= 0 ? 'var(--teal)' : 'var(--burgundy)') + ';font-weight:600">' + F2(r.gopS) + '</td><td class="num" style="color:' + (r.gopC >= 0 ? 'var(--teal)' : 'var(--burgundy)') + ';font-weight:600">' + F2(r.gopC) + '</td></tr>' +
+            '<tr><td>GOP\u7387</td><td class="num">' + P(r.gopRS) + '</td><td class="num">' + P(r.gopRC) + '</td></tr>' +
+          '</table></div>' +
+          '<h4 style="font-size:.72rem;color:var(--navy);margin-bottom:.5rem;font-weight:700">\u76c8\u4e8f\u5e73\u8861\u5206\u6790</h4>' +
+          '<div class="table-wrap"><table><tr><th>\u6307\u6807</th><th class="num">\u7a33\u5065</th><th class="num">\u4fdd\u5b88</th></tr>' +
+            '<tr><td>\u76c8\u4e8f\u5e73\u8861RevPar</td><td class="num">' + F2(r.beRPS) + '</td><td class="num">' + F2(r.beRPC) + '</td></tr>' +
+            '<tr><td>\u76c8\u4e8f\u5e73\u8861\u51fa\u79df\u7387</td><td class="num">' + P(r.beOCCS) + '</td><td class="num">' + P(r.beOCCC) + '</td></tr>' +
+          '</table></div>' +
+        '</div>' +
 
-        <h4 style="font-size:.8rem;margin:1rem 0 .5rem;color:var(--navy)">租金测算</h4>
-        <table>
-          <tr><th>年固定租金</th><th>年浮动租金</th><th>年总租金</th><th>月租金</th><th>日租金</th></tr>
-          <tr><td class="num">${F(r.yearFixedRent)}</td><td class="num">${F(r.yearFloatRent)}</td><td class="num" style="font-weight:600">${F(r.yearTotalRent)}</td><td class="num">${F(r.monthRent)}</td><td class="num">${F(r.dayRent)}</td></tr>
-        </table>
-      </div>
-    </div>
-  `;
+      '</div></div></div>';
 
-  document.getElementById('calcResultPanel').innerHTML = html;
+  // Render charts if chart tab is clicked
+  setTimeout(() => {
+    if (document.getElementById('calc-tab-charts') && document.getElementById('calc-tab-charts').classList.contains('active')) {
+      renderCharts(r);
+    }
+  }, 100);
 }
 
-async function exportPDF(calcId) {
-  const url = API + '/api/export-pdf/' + calcId;
-  showToast('正在生成 PDF…');
-  try {
-    const r = await fetchWithRetry(url, {}, 3);
-    const blob = await r.blob();
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = '致城酒店投资报告_' + calcId + '.pdf';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(a.href);
-    showToast('PDF 下载完成');
-  } catch(e) {
-    showToast('下载失败：' + e.message, true);
+function drow(l, v, c) {
+  return '<div class="d-row"><span class="d-lbl">' + l + '</span><span class="d-val"' + (c ? ' style="color:' + c + '"' : '') + '>' + v + '</span></div>';
+}
+
+function switchCalcTab(btn, tabId) {
+  const card = btn.closest('.card-body') || btn.closest('.card');
+  if (!card) return;
+  card.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  card.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('calc-tab-' + tabId);
+  if (panel) panel.classList.add('active');
+  if (tabId === 'charts' && calcHistory.length > 0) {
+    loadChartJS(() => {
+      renderCharts(calcHistory[0].result);
+    });
   }
 }
 
-async function printReport(calcId) {
-  const url = API + '/api/export-report/' + calcId;
-  try {
-    const r = await fetchWithRetry(url, {}, 3);
-    const html = await r.text();
-    const w = window.open('', '_blank');
-    if (!w) { window.open(url); return; }
-    w.document.write(html);
-    w.document.close();
-    w.onload = () => { setTimeout(() => w.print(), 800); };
-  } catch(e) {
-    showToast('打印报告失败：' + e.message, true);
+// ===== CHARTS =====
+function destroyChart(id) { if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; } }
+function renderCharts(r) {
+  if (!Chart) { console.warn('Chart.js not loaded yet'); return; }
+  destroyChart('season');
+  const ctx1 = document.getElementById('chartSeason');
+  if (ctx1) {
+    chartInstances['season'] = new Chart(ctx1, {
+      type: 'doughnut',
+      data: { labels: ['\u65fa\u5b63', '\u5e73\u5b63', '\u6de1\u5b63'], datasets: [{ data: [r.peakRev, r.midRev, r.lowRev], backgroundColor: ['#2d6a5e', '#b8963e', '#7a2e3f'], borderWidth: 2, borderColor: '#fff' }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } }, tooltip: { callbacks: { label: ctx => ctx.label + ': \u00a5' + Math.round(ctx.raw).toLocaleString() } } } }
+    });
+  }
+  destroyChart('compare');
+  const ctx2 = document.getElementById('chartCompare');
+  if (ctx2) {
+    chartInstances['compare'] = new Chart(ctx2, {
+      type: 'bar',
+      data: { labels: ['\u5168\u5e74\u6536\u5165', '\u5168\u5e74\u6210\u672c', 'GOP\u6bdb\u5229'], datasets: [{ label: '\u7a33\u5065', data: [r.yearRevS, r.costS, r.gopS], backgroundColor: '#2d6a5e', borderRadius: 4 }, { label: '\u4fdd\u5b88', data: [r.yearRevC, r.costC, r.gopC], backgroundColor: '#b8963e', borderRadius: 4 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } }, tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': \u00a5' + Math.round(ctx.raw).toLocaleString() } }, scales: { y: { ticks: { callback: v => '\u00a5' + (v / 10000).toFixed(0) + 'w' } } } }
+    });
+  }
+  destroyChart('cost');
+  const ctx3 = document.getElementById('chartCost');
+  if (ctx3) {
+    const marg = parseFloat(document.getElementById('calcMarginal').value) || 0;
+    chartInstances['cost'] = new Chart(ctx3, {
+      type: 'bar',
+      data: { labels: ['\u6210\u672c\u7ed3\u6784'], datasets: [{ label: '\u5e74\u79df\u91d1', data: [r.yearRent], backgroundColor: '#1e3a5f', borderRadius: 3 }, { label: '\u8fb9\u9645\u6210\u672c', data: [marg], backgroundColor: '#b8963e', borderRadius: 3 }, { label: '\u4eba\u5de5\u6210\u672c', data: [r.yearSalary], backgroundColor: '#7a2e3f', borderRadius: 3 }] },
+      options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } }, tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': \u00a5' + Math.round(ctx.raw).toLocaleString() } }, scales: { x: { stacked: true, ticks: { callback: v => '\u00a5' + (v / 10000).toFixed(0) + 'w' } }, y: { stacked: true } } }
+    });
   }
 }
 
-// ═══════════════ UTILS ═══════════════
+// ===== FULL REPORT =====
+function viewReport(histId) {
+  document.querySelector('.nav-btn[data-page="report"]').click();
+  const h = calcHistory.find(x => x.id === histId);
+  if (!h) { toast('\u627e\u4e0d\u5230\u6d4b\u7b97\u8bb0\u5f55', true); return; }
+  renderFullReport(h);
+}
 
-// 带重试的 fetch，自动处理网络不稳定
-async function fetchWithRetry(url, options = {}, retries = 3) {
-  const delay = (attempt) => Math.min(1000 * Math.pow(2, attempt), 8000);
-  for (let i = 0; i < retries; i++) {
-    try {
-      const r = await fetch(url, options);
-      if (r.ok) return r;
-      if (r.status >= 400 && r.status < 500) throw new Error('服务器返回 ' + r.status); // 4xx 不重试
-      if (i < retries - 1) await new Promise(r => setTimeout(r, delay(i)));
-    } catch (e) {
-      if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
-        if (i < retries - 1) {
-          showToast(`连接失败，重试中 (${i + 2}/${retries})…`, true);
-          await new Promise(r => setTimeout(r, delay(i)));
-          continue;
+function renderFullReport(h) {
+  const r = h.result; const p = h.params;
+  const F = v => '\u00a5' + Number(v).toLocaleString('zh-CN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  const F2 = v => '\u00a5' + Number(v).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const P = v => Number(v).toFixed(1) + '%';
+  const N = v => Number(v).toLocaleString('zh-CN');
+  const roi_cs = r.roiS < 2.5 ? '#2d6a5e' : r.roiS < 5 ? '#b8963e' : '#7a2e3f';
+
+  const html = '<div class="slide-up">' +
+    '<div class="report-actions no-print">' +
+      '<div class="report-actions-left"><span class="report-badge">' + esc(r.hotelName) + '</span><span class="report-badge">' + r.calcTime + '</span><span class="report-badge">\u6d4b\u7b97\u4eba\uff1a' + esc(h.createdBy || '\u2014') + '</span></div>' +
+      '<div style="display:flex;gap:.4rem">' +
+        '<button class="btn btn-teal btn-lg" onclick="downloadPDF()">\ud83d\udcbe \u4e0b\u8f7d PDF</button>' +
+        '<button class="btn btn-ghost" onclick="window.print()">\ud83c\udf9f \u76f4\u63a5\u6253\u5370</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="report-document">' +
+      '<div class="report-page">' +
+        '<div class="rpt-title">\u81f4\u57ce\u9152\u5e97\u6295\u8d44\u6d4b\u7b97\u62a5\u544a</div>' +
+        '<div class="rpt-subtitle">' + esc(r.hotelName) + '</div>' +
+        '<div class="rpt-meta">\u6d4b\u7b97\u65f6\u95f4\uff1a' + r.calcTime + ' \u00b7 \u6d4b\u7b97\u4eba\uff1a' + esc(h.createdBy || '\u2014') + ' \u00b7 \u81f4\u57ce\u9152\u5e97\u96c6\u56e2</div>' +
+        '<hr class="rpt-divider">' +
+        '<div class="rpt-verdict-wrap"><div class="rpt-verdict" style="background:' + r.verdictColor + '">' + r.verdict + '</div></div>' +
+        '<div class="rpt-section-title">\u4e00\u3001\u6295\u8d44\u51b3\u7b56\u6982\u89c8</div>' +
+        '<div class="rpt-kpi-grid">' +
+          '<div class="rpt-kpi-card"><div class="rk-l">\u9879\u76ee\u4ecb\u5165\u9884\u7b97</div><div class="rk-v">' + F(r.invest) + '</div></div>' +
+          '<div class="rpt-kpi-card"><div class="rk-l">\u5e74\u5316\u56de\u62a5\uff08\u7a33\u5065\uff09</div><div class="rk-v" style="color:' + roi_cs + '">' + (r.roiS === 999 ? '\u221e' : r.roiS.toFixed(1)) + ' \u5e74</div></div>' +
+          '<div class="rpt-kpi-card"><div class="rk-l">\u5e74\u5316\u56de\u62a5\uff08\u4fdd\u5b88\uff09</div><div class="rk-v">' + (r.roiC === 999 ? '\u221e' : r.roiC.toFixed(1)) + ' \u5e74</div></div>' +
+          '<div class="rpt-kpi-card"><div class="rk-l">\u6708\u7eaf\u5229\uff08\u7a33\u5065\uff09</div><div class="rk-v">' + F(r.monthNetS) + '</div><div class="rk-s">\u7ecf\u8425\u65b9\u53ef\u5206\u914d</div></div>' +
+          '<div class="rpt-kpi-card"><div class="rk-l">\u6708\u7eaf\u5229\uff08\u4fdd\u5b88\uff09</div><div class="rk-v">' + F(r.monthNetC) + '</div><div class="rk-s">\u6298\u6263 ' + p.discount + '%</div></div>' +
+          '<div class="rpt-kpi-card"><div class="rk-l">\u5355\u623f\u65e5\u79df\u91d1\u6210\u672c</div><div class="rk-v">' + F2(r.roomDayRent) + '</div><div class="rk-s">\u9700\u8986\u76d6\u7684\u5e95\u7ebf\u6210\u672c</div></div>' +
+        '</div>' +
+        '<div class="rpt-section-title">\u4e8c\u3001\u6295\u8d44\u7ed3\u6784\u660e\u7ec6</div>' +
+        '<table class="rpt-table"><tr><th>\u9879\u76ee</th><th class="num">\u91d1\u989d</th><th class="num">\u5360\u6bd4</th></tr>' +
+          '<tr><td>\u8f6c\u8ba9\u9884\u7b97</td><td class="num">' + F(r.transfer) + '</td><td class="num">' + (r.invest > 0 ? (r.transfer / r.invest * 100).toFixed(1) : 0) + '%</td></tr>' +
+          '<tr><td>\u623f\u62bc\u9884\u7b97</td><td class="num">' + F(r.deposit) + '</td><td class="num">' + (r.invest > 0 ? (r.deposit / r.invest * 100).toFixed(1) : 0) + '%</td></tr>' +
+          '<tr><td>\u7b79\u5f00\u9884\u7b97</td><td class="num">' + F(r.startup) + '</td><td class="num">' + (r.invest > 0 ? (r.startup / r.invest * 100).toFixed(1) : 0) + '%</td></tr>' +
+          '<tr><td>\u7ffb\u65b0\u9884\u7b97</td><td class="num">' + F(r.reno) + '</td><td class="num">' + (r.invest > 0 ? (r.reno / r.invest * 100).toFixed(1) : 0) + '%</td></tr>' +
+          '<tr class="subtotal"><td>\u603b\u6295\u8d44\u9884\u7b97</td><td class="num">' + F(r.invest) + '</td><td class="num">100%</td></tr>' +
+        '</table>' +
+      '</div>' +
+      '<div class="report-page">' +
+        '<div class="rpt-section-title">\u4e09\u3001\u4e09\u5b63\u6536\u5165\u6a21\u578b</div>' +
+        '<table class="rpt-table"><tr><th>\u5b63\u8282</th><th class="num">\u6708\u4efd</th><th class="num">ADR\uff08\u5143\uff09</th><th class="num">OCC</th><th class="num">RevPar\uff08\u5143\uff09</th><th class="num">\u5ba2\u623f\u6536\u5165\uff08\u5143\uff09</th></tr>' +
+          '<tr><td style="color:#2d6a5e;font-weight:600">\u65fa\u5b63</td><td class="num">' + p.peakM + '</td><td class="num">' + F2(p.peakADR) + '</td><td class="num">' + P(p.peakOCC) + '</td><td class="num">' + F2(p.peakADR * p.peakOCC / 100) + '</td><td class="num">' + F(r.peakRev) + '</td></tr>' +
+          '<tr><td style="color:#8a6d2e;font-weight:600">\u5e73\u5b63</td><td class="num">' + p.midM + '</td><td class="num">' + F2(p.midADR) + '</td><td class="num">' + P(p.midOCC) + '</td><td class="num">' + F2(p.midADR * p.midOCC / 100) + '</td><td class="num">' + F(r.midRev) + '</td></tr>' +
+          '<tr><td style="color:#7a2e3f;font-weight:600">\u6de1\u5b63</td><td class="num">' + p.lowM + '</td><td class="num">' + F2(p.lowADR) + '</td><td class="num">' + P(p.lowOCC) + '</td><td class="num">' + F2(p.lowADR * p.lowOCC / 100) + '</td><td class="num">' + F(r.lowRev) + '</td></tr>' +
+          '<tr class="subtotal"><td style="font-weight:700">\u5168\u5e74\u5408\u8ba1</td><td class="num">12</td><td class="num">' + F2(r.yearADRS) + '</td><td class="num">' + P(r.yearOCC) + '</td><td class="num">' + F2(r.yearRPS) + '</td><td class="num">' + F(r.yearRevS) + '</td></tr>' +
+        '</table>' +
+        '<div class="rpt-section-title">\u56db\u3001\u7a33\u5065 vs \u4fdd\u5b88\u5bf9\u6bd4</div>' +
+        '<div class="rpt-dual"><div class="rpt-stable"><h4>\u7a33\u5065\u6d4b\u7b97</h4>' +
+          rpt_drow('\u5168\u5e74\u6536\u5165', F(r.yearRevS)) + rpt_drow('RevPar', F2(r.yearRPS)) +
+          rpt_drow('ADR / OCC', F2(r.yearADRS) + ' / ' + P(r.yearOCC)) + rpt_drow('\u95f4\u591c\u6570', N(r.rnS)) +
+          rpt_drow('\u5168\u5e74\u6210\u672c', F2(r.costS)) + rpt_drow('GOP\u6bdb\u5229', F2(r.gopS), r.gopS >= 0 ? '#2d6a5e' : '#7a2e3f') +
+          rpt_drow('GOP\u7387', P(r.gopRS)) + rpt_drow('\u6708\u7eaf\u5229', F(r.monthNetS)) +
+          rpt_drow('\u5e74\u5316\u56de\u62a5', (r.roiS === 999 ? '\u221e' : r.roiS.toFixed(1)) + ' \u5e74') + rpt_drow('\u76c8\u4e8f\u5e73\u8861RevPar', F2(r.beRPS)) + rpt_drow('\u76c8\u4e8f\u5e73\u8861OCC', P(r.beOCCS)) +
+        '</div><div class="rpt-cons"><h4>\u4fdd\u5b88\u6d4b\u7b97\uff08\u6298\u6263 ' + p.discount + '%\uff09</h4>' +
+          rpt_drow('\u5168\u5e74\u6536\u5165', F(r.yearRevC)) + rpt_drow('RevPar', F2(r.yearRPC)) +
+          rpt_drow('ADR', F2(r.yearADRC)) + rpt_drow('\u95f4\u591c\u6570', N(r.rnC)) +
+          rpt_drow('\u5168\u5e74\u6210\u672c', F2(r.costC)) + rpt_drow('GOP\u6bdb\u5229', F2(r.gopC), r.gopC >= 0 ? '#2d6a5e' : '#7a2e3f') +
+          rpt_drow('GOP\u7387', P(r.gopRC)) + rpt_drow('\u6708\u7eaf\u5229', F(r.monthNetC)) +
+          rpt_drow('\u5e74\u5316\u56de\u62a5', (r.roiC === 999 ? '\u221e' : r.roiC.toFixed(1)) + ' \u5e74') + rpt_drow('\u76c8\u4e8f\u5e73\u8861RevPar', F2(r.beRPC)) + rpt_drow('\u76c8\u4e8f\u5e73\u8861OCC', P(r.beOCCC)) +
+        '</div></div>' +
+      '</div>' +
+      '<div class="report-page">' +
+        '<div class="rpt-section-title">\u4e94\u3001\u79df\u91d1\u4e0e\u6210\u672c\u5206\u6790</div>' +
+        '<table class="rpt-table"><tr><th>\u9879\u76ee</th><th class="num">\u91d1\u989d</th></tr>' +
+          '<tr><td>\u5e74\u56fa\u5b9a\u79df\u91d1\uff08' + p.totalArea + 'm\u00b2 \u00d7 \u00a5' + (p.sqmRent + p.propFee) + '/m\u00b2/\u6708 \u00d7 12\uff09</td><td class="num">' + F2(r.yearFixed) + '</td></tr>' +
+          '<tr><td>\u5e74\u6d6e\u52a8\u79df\u91d1\uff08\u6263\u70b9 ' + p.rentRatio + '% \u00d7 \u57fa\u6570 \u00a5' + F(p.rentBase) + '\uff09</td><td class="num">' + F2(r.yearFloat) + '</td></tr>' +
+          '<tr class="subtotal"><td>\u5e74\u603b\u79df\u91d1</td><td class="num">' + F2(r.yearRent) + '</td></tr>' +
+          '<tr><td>\u6708\u5747\u79df\u91d1</td><td class="num">' + F2(r.monthRent) + '</td></tr>' +
+          '<tr><td>\u5355\u623f\u65e5\u79df\u91d1\u6210\u672c</td><td class="num">' + F2(r.roomDayRent) + '</td></tr>' +
+        '</table>' +
+        '<div class="rpt-note">\u5355\u623f\u65e5\u79df\u91d1\u662f\u6700\u6838\u5fc3\u7684\u6210\u672c\u6307\u6807\uff0c\u4ee3\u8868\u6bcf\u95f4\u623f\u6bcf\u5929\u9700\u8981\u4ea7\u751f\u7684\u6700\u4f4e\u6536\u5165\u624d\u80fd\u8986\u76d6\u79df\u91d1\u3002\u82e5 ADR \u00d7 OCC < \u5355\u623f\u65e5\u79df\u91d1\uff0c\u7ecf\u8425\u5c06\u4e8f\u635f\u3002</div>' +
+        '<table class="rpt-table"><tr><th>\u6210\u672c\u9879\u76ee</th><th class="num">\u7a33\u5065</th><th class="num">\u4fdd\u5b88</th></tr>' +
+          '<tr><td>\u5e74\u603b\u79df\u91d1</td><td class="num">' + F2(r.yearRent) + '</td><td class="num">' + F2(r.yearRent) + '</td></tr>' +
+          '<tr><td>\u5e74\u8fb9\u9645\u6210\u672c</td><td class="num">' + F2(p.marginal) + '</td><td class="num">' + F2(p.marginal * p.discount / 100) + '</td></tr>' +
+          '<tr><td>\u5e74\u4eba\u5de5\u6210\u672c\uff08' + p.staffCount + '\u4eba\uff09</td><td class="num">' + F2(r.yearSalary) + '</td><td class="num">' + F2(r.yearSalary * p.discount / 100) + '</td></tr>' +
+          '<tr class="subtotal"><td>\u5e74\u603b\u6210\u672c</td><td class="num">' + F2(r.costS) + '</td><td class="num">' + F2(r.costC) + '</td></tr>' +
+          '<tr><td>\u95f4\u591c\u603b\u6210\u672c</td><td class="num">' + F2(r.nightTotal) + '</td><td class="num">\u2014</td></tr>' +
+          '<tr><td>GOP \u6bdb\u5229</td><td class="num" style="font-weight:700;color:' + (r.gopS >= 0 ? '#2d6a5e' : '#7a2e3f') + '">' + F2(r.gopS) + '</td><td class="num" style="font-weight:700;color:' + (r.gopC >= 0 ? '#2d6a5e' : '#7a2e3f') + '">' + F2(r.gopC) + '</td></tr>' +
+          '<tr><td>GOP \u7387</td><td class="num">' + P(r.gopRS) + '</td><td class="num">' + P(r.gopRC) + '</td></tr>' +
+        '</table>' +
+        '<div class="rpt-section-title">\u516d\u3001\u76c8\u4e8f\u5e73\u8861\u5206\u6790</div>' +
+        '<table class="rpt-table"><tr><th>\u6307\u6807</th><th class="num">\u7a33\u5065</th><th class="num">\u4fdd\u5b88</th></tr>' +
+          '<tr><td>\u76c8\u4e8f\u5e73\u8861 RevPar</td><td class="num">' + F2(r.beRPS) + '</td><td class="num">' + F2(r.beRPC) + '</td></tr>' +
+          '<tr><td>\u76c8\u4e8f\u5e73\u8861 \u51fa\u79df\u7387</td><td class="num">' + P(r.beOCCS) + '</td><td class="num">' + P(r.beOCCC) + '</td></tr>' +
+        '</table>' +
+        '<div class="rpt-note">\u76c8\u4e8f\u5e73\u8861 RevPar \u4e0e OCC \u662f\u7ecf\u8425\u5e95\u7ebf\u3002\u5f53\u6781\u7aef\u573a\u666f\uff08\u5982\u6de1\u5b63 OCC=40%\uff0cADR=' + F2(r.yearADRS) + '\u5143\uff09\u4e0b\u7684 RevPar=' + F2(r.yearADRS * 0.4) + '\u5143\u4f4e\u4e8e\u76c8\u4e8f\u5e73\u8861 RevPar\uff08' + F2(r.beRPS) + '\u5143\uff09\u65f6\uff0c\u9152\u5e97\u5c06\u6301\u7eed\u4e8f\u635f\u3002\u5efa\u8bae\u5efa\u7acb\u5e94\u6025\u516c\u79ef\u91d1\u4ee5\u8986\u76d6\u6de1\u5b63\u73b0\u91d1\u6d41\u7f3a\u53e3\u3002</div>' +
+        '<div class="rpt-footer">\u81f4\u57ce\u9152\u5e97\u6295\u8d44\u6d4b\u7b97\u7cfb\u7edf v4 \u00b7 \u672c\u62a5\u544a\u4ec5\u4f9b\u5185\u90e8\u51b3\u7b56\u53c2\u8003 \u00b7 \u6570\u636e\u622a\u81f3 ' + r.calcTime + '</div>' +
+      '</div>' +
+    '</div></div>';
+
+  document.getElementById('reportContent').innerHTML = html;
+  document.getElementById('reportContent').dataset.histId = h.id;
+}
+
+function rpt_drow(l, v, c) {
+  return '<div class="rpt-drow"><span class="rpt-dl">' + l + '</span><span' + (c ? ' style="color:' + c + '"' : '') + '>' + v + '</span></div>';
+}
+
+// ===== PDF DOWNLOAD =====
+function downloadPDF() {
+  const repEl = document.getElementById('reportContent');
+  if (!repEl || !repEl.querySelector('.report-document')) { toast('\u8bf7\u5148\u751f\u6210\u6d4b\u7b97\u62a5\u544a', true); return; }
+  toast('\u6b63\u5728\u6253\u5f00\u6253\u5370\u5bf9\u8bdd\u6846\uff0c\u8bf7\u9009\u62e9\u300c\u53e6\u5b58\u4e3a PDF\u300d', false);
+  setTimeout(() => { window.print(); }, 500);
+}
+
+// ===== HISTORY =====
+function renderHistory() {
+  const el = document.getElementById('historyList');
+  if (!calcHistory.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">\ud83d\udcd0</div><p>\u6682\u65e0\u6d4b\u7b97\u5386\u53f2</p></div>'; return; }
+  el.innerHTML = calcHistory.map(h => {
+    const r = h.result;
+    const dc = r.verdictColor || '#888';
+    const hid = esc(h.id, true);
+    return '<div class="hist-item" onclick="loadHistory(\'' + hid + '\')">' +
+      '<div class="hist-dot" style="background:' + dc + '"></div>' +
+      '<div><div class="hist-name">' + esc(r.hotelName) + '</div>' +
+        '<div class="hist-meta">' + h.createdAt + ' \u00b7 ' + (h.createdBy || '\u2014') + '</div></div>' +
+      '<div style="margin-left:auto;text-align:right"><div class="hist-roi" style="color:' + dc + '">' + r.verdict + '</div>' +
+        '<div style="font-size:.6rem;color:var(--warm-400)">ROI ' + (r.roiS === 999 ? '\u221e' : r.roiS.toFixed(1)) + '\u5e74</div></div>' +
+    '</div>';
+  }).join('');
+}
+
+function loadHistory(hid) {
+  const h = calcHistory.find(x => x.id === hid); if (!h) return;
+  document.querySelector('.nav-btn[data-page="calc"]').click();
+  const p = h.params;
+  document.getElementById('calcHotelName').value = p.hotelName || '';
+  document.getElementById('calcContact').value = p.contact || '';
+  document.getElementById('calcPhone').value = p.phone || '';
+  document.getElementById('calcRooms').value = p.roomCount || 48;
+  document.getElementById('calcArea').value = p.totalArea || 1800;
+  document.getElementById('calcInvest').value = p.invest || 0;
+  document.getElementById('calcTransfer').value = p.transfer || 0;
+  document.getElementById('calcDeposit').value = p.deposit || 0;
+  document.getElementById('calcStartup').value = p.startup || 0;
+  document.getElementById('calcReno').value = p.reno || 0;
+  document.getElementById('calcSqmRent').value = p.sqmRent || 0;
+  document.getElementById('calcPropFee').value = p.propFee || 0;
+  document.getElementById('calcRentRatio').value = p.rentRatio || 0;
+  document.getElementById('calcRentBase').value = p.rentBase || 0;
+  document.getElementById('calcPeakM').value = p.peakM || 3;
+  document.getElementById('calcPeakADR').value = p.peakADR || 0;
+  document.getElementById('calcPeakOCC').value = p.peakOCC || 0;
+  document.getElementById('calcMidM').value = p.midM || 6;
+  document.getElementById('calcMidADR').value = p.midADR || 0;
+  document.getElementById('calcMidOCC').value = p.midOCC || 0;
+  document.getElementById('calcLowM').value = p.lowM || 3;
+  document.getElementById('calcLowADR').value = p.lowADR || 0;
+  document.getElementById('calcLowOCC').value = p.lowOCC || 0;
+  document.getElementById('calcDiscount').value = p.discount || 85;
+  document.getElementById('calcMarginal').value = p.marginal || 0;
+  document.getElementById('calcStaff').value = p.staffCount || 0;
+  document.getElementById('calcSalary').value = p.salary || 0;
+  document.getElementById('calcFund').value = p.fund || 5;
+  document.getElementById('calcMgmt').value = p.mgmt || 2;
+  document.getElementById('calcDiv').value = p.divRatio || 100;
+  renderCalcResult(h.result, h.id);
+  toast('\u5df2\u52a0\u8f7d\u5386\u53f2\uff1a' + h.result.hotelName);
+}
+
+function clearHistory() { if (!confirm('\u786e\u8ba4\u6e05\u7a7a\u5168\u90e8\u6d4b\u7b97\u5386\u53f2\uff1f')) return; calcHistory = []; DB.set('calcHistory', []); renderHistory(); toast('\u5386\u53f2\u5df2\u6e05\u7a7a'); }
+
+function resetForm() {
+  if (!confirm('\u786e\u8ba4\u91cd\u7f6e\u6240\u6709\u53c2\u6570\uff1f')) return;
+  document.getElementById('linkClient').value = '';
+  ['calcHotelName','calcContact','calcPhone'].forEach(id => { try { document.getElementById(id).value = ''; } catch(e) {} });
+  document.getElementById('calcRooms').value = 48; document.getElementById('calcArea').value = 1800;
+  document.getElementById('calcInvest').value = 730000; document.getElementById('calcTransfer').value = 500000;
+  document.getElementById('calcDeposit').value = 180000; document.getElementById('calcStartup').value = 50000;
+  document.getElementById('calcReno').value = 0; document.getElementById('calcSqmRent').value = 25;
+  document.getElementById('calcPropFee').value = 0; document.getElementById('calcRentRatio').value = 0;
+  document.getElementById('calcRentBase').value = 0; document.getElementById('calcPeakM').value = 3;
+  document.getElementById('calcPeakADR').value = 180; document.getElementById('calcPeakOCC').value = 90;
+  document.getElementById('calcMidM').value = 6; document.getElementById('calcMidADR').value = 160;
+  document.getElementById('calcMidOCC').value = 90; document.getElementById('calcLowM').value = 3;
+  document.getElementById('calcLowADR').value = 120; document.getElementById('calcLowOCC').value = 80;
+  document.getElementById('calcDiscount').value = 85; document.getElementById('calcMarginal').value = 240000;
+  document.getElementById('calcStaff').value = 8; document.getElementById('calcSalary').value = 60000;
+  document.getElementById('calcFund').value = 5; document.getElementById('calcMgmt').value = 2;
+  document.getElementById('calcDiv').value = 100; toast('\u53c2\u6570\u5df2\u91cd\u7f6e');
+}
+
+function savePreset() {
+  const p = getParams();
+  const name = prompt('\u4e3a\u8be5\u9884\u8bbe547d\u540d\uff1a', p.hotelName || '');
+  if (!name) return;
+  const presets = DB.get('presets') || [];
+  presets.unshift({ name: name, params: p, savedAt: nowStr() });
+  DB.set('presets', presets);
+  toast('\u9884\u8bbe\u5df2\u4fdd\u5b58\uff1a' + name);
+}
+
+// ===== COPY RESULT =====
+function copyResult(histId) {
+  const h = calcHistory.find(x => x.id === histId); if (!h) return;
+  const r = h.result;
+  navigator.clipboard.writeText(
+    '\u3010' + r.hotelName + ' \u6295\u8d44\u6d4b\u7b97\u6458\u8981\u3011\n\u6295\u8d44\u5efa\u8bae\uff1a' + r.verdict + '\n\u6d4b\u7b97\u65f6\u95f4\uff1a' + r.calcTime +
+    '\n\n\u9879\u76ee\u4ecb\u5165\u9884\u7b97\uff1a\u00a5' + Math.round(r.invest).toLocaleString() +
+    '\n\u5e74\u5316\u56de\u62a5\uff08\u7a33\u5065\uff09\uff1a' + r.roiS.toFixed(1) + '\u5e74 \u00b7 \u5e74\u5316\u56de\u62a5\uff08\u4fdd\u5b88\uff09\uff1a' + r.roiC.toFixed(1) + '\u5e74' +
+    '\n\u6708\u7eaf\u5229\uff08\u7a33\u5065\uff09\uff1a\u00a5' + Math.round(r.monthNetS).toLocaleString() + ' \u00b7 \u6708\u7eaf\u5229\uff08\u4fdd\u5b88\uff09\uff1a\u00a5' + Math.round(r.monthNetC).toLocaleString() +
+    '\n\n\u7a33\u5065\u5168\u5e74\u6536\u5165\uff1a\u00a5' + Math.round(r.yearRevS).toLocaleString() +
+    '\nGOP\u7387\uff08\u7a33\u5065\uff09\uff1a' + r.gopRS.toFixed(1) + '% \u00b7 \u76c8\u4e8f\u5e73\u8861OCC\uff1a' + r.beOCCS.toFixed(1) + '%'
+  ).then(() => toast('\u6458\u8981\u5df2\u590d\u5236')).catch(() => toast('\u590d\u5236\u5931\u8d25', true));
+}
+
+// ===== UTILS =====
+function nowStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ':' + String(d.getSeconds()).padStart(2, '0');
+}
+function esc(s, forAttr) {
+  if (!s) return '';
+  s = String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  if (forAttr) s = s.replace(/'/g, '&#39;');
+  return s;
+}
+function toast(msg, isErr) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isErr ? ' err' : '') + ' show';
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => { t.className = 'toast'; }, 2200);
+}
+
+// ===== SHARED DATA CHECK (for share bundle) =====
+(function() {
+  if (window.__SHARED_DATA__) {
+    var sd = window.__SHARED_DATA__;
+    ['clients', 'calcHistory', 'presets'].forEach(function(k) {
+      if (sd[k] && sd[k].length > 0) {
+        var existing = JSON.parse(localStorage.getItem('zhicheng_v3_' + k) || '[]');
+        if (existing.length === 0) {
+          localStorage.setItem('zhicheng_v3_' + k, JSON.stringify(sd[k]));
         }
       }
-      throw e;
-    }
-  }
-  throw new Error('多次重试后仍无法连接');
-}
-
-function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-function showToast(msg, isError) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast' + (isError ? ' error' : '') + ' show';
-  clearTimeout(t._tid); t._tid = setTimeout(() => t.className = 'toast', 2000);
-}
-
-init();
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js').catch(() => {});
-}
-</script>
-</body>
-</html>
+    });
+    if (sd.sharedBy) {
+      localStorage.setItem('zhicheng_v3_user', JSON.stringify({ id: 'shared', name: sd.sharedBy }));
